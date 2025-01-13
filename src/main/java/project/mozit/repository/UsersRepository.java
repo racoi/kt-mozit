@@ -6,4 +6,7 @@ import project.mozit.domain.Users;
 
 @Repository
 public interface UsersRepository extends JpaRepository<Users, Long> {
+    boolean existsByUserId(String userid);
+
+    Users findByUserId(String username);
 }
