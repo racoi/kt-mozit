@@ -1,5 +1,6 @@
 package project.mozit.service;
 
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -8,13 +9,11 @@ import project.mozit.dto.UsersDTO;
 import project.mozit.repository.UsersRepository;
 
 @Service
+@AllArgsConstructor
 public class SignUpService {
 
-    @Autowired
-    private UsersRepository userRepository;
-
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final UsersRepository userRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public void joinProcess(UsersDTO.Post usersDto){
 
@@ -29,8 +28,12 @@ public class SignUpService {
         data.setUserPwd(bCryptPasswordEncoder.encode(usersDto.getUserPwd()));
         data.setUserName(usersDto.getUserName());
         data.setUserEmail(usersDto.getUserEmail());
-        data.setUserRole("ROLE_USER");
+//        data.setUserEmail(usersDto.getEnterpriseNum());
 
         userRepository.save(data);
+    }
+
+    public boolean checkUserId(String userId) {
+        return userRepository.existsByUserId(userId);
     }
 }

@@ -22,14 +22,15 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers(new AntPathRequestMatcher("/**", "/users/**")).permitAll()
+                        .requestMatchers("/**").permitAll()
                 )
 
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/h2-console/**", "/users/**")
+                        .ignoringRequestMatchers("/h2-console/**", "/users/**", "/api/upload")
                 )
 
                 .formLogin((auth) -> auth
+                        .loginPage("/users/login")
                         .loginProcessingUrl("/users/loginProc")
                         .successHandler((request, response, authentication) -> {
                             response.setContentType("application/json;charset=UTF-8");

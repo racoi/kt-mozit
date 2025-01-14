@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>동영상 업로드</title>
+</head>
+<body>
+<h1>동영상 업로드</h1>
+<form id="uploadForm" action="/api/upload" method="post" enctype="multipart/form-data">
+    <label for="videoFile">동영상 파일 선택:</label>
+    <input type="file" id="videoFile" name="videoFile" accept="video/*" required>
+    <button type="submit">업로드</button>
+</form>
+
+<h2>업로드 후 다운로드</h2>
+<form id="downloadForm" onsubmit="downloadFile(event)">
+    <label for="fileName">다운로드할 파일 이름:</label>
+    <input type="text" id="fileName" name="fileName" required>
+    <button type="submit">다운로드</button>
+</form>
+
+<script>
+    function downloadFile(event) {
+        event.preventDefault(); // 기본 폼 제출 방지
+        const fileName = document.getElementById("fileName").value;
+
+        // 동적으로 URL 생성 후 리다이렉트
+        if (fileName) {
+            window.location.href = `/api/download/${encodeURIComponent(fileName)}`;
+        } else {
+            alert("파일 이름을 입력하세요.");
+        }
+    }
+</script>
+</body>
+</html>
