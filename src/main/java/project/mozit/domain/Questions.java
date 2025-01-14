@@ -30,8 +30,7 @@ public class Questions {
     private QuestionType questionType;
 
     @Column(name = "question_state", nullable = false)
-    @ColumnDefault("0")
-    private Boolean questionState;
+    private Boolean questionState = false;
 
     @Column(name = "question_image")
     private String questionImage;
@@ -41,7 +40,8 @@ public class Questions {
     private Users userNum;
 
     public enum QuestionType{
-        PRODUCT,
-        SERVICE
+        SERVICE,
+        ACCOUNT,
+        GENERAL
     }
 }

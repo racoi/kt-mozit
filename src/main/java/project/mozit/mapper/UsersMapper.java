@@ -9,7 +9,7 @@ import project.mozit.dto.UsersDTO;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+@Mapper(componentModel = "spring")
 public interface UsersMapper {
 
     @Mapping(target = "userNum", ignore = true)
