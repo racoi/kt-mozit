@@ -22,11 +22,11 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers(new AntPathRequestMatcher("/**", "/users/**")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/**")).permitAll()
                 )
 
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/h2-console/**", "/users/**")
+                        .ignoringRequestMatchers("/h2-console/**", "/users/**", "/api/upload")
                 )
 
                 .formLogin((auth) -> auth
@@ -60,7 +60,6 @@ public class SecurityConfig {
 
                 .sessionManagement((auth) -> auth
                         .sessionFixation().changeSessionId());
-        ;
         return http.build();
     }
 }
