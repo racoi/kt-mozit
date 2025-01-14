@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import project.mozit.domain.Enterprises;
 
 @Repository
-public interface EnterprisesRepository extends JpaRepository<Enterprises, Integer> {
+public interface EnterprisesRepository extends JpaRepository<Enterprises, Long> {
 }

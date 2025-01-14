@@ -10,7 +10,7 @@ import lombok.Data;
 public class Enterprises {
 
     @Id
-    private Integer EnterpriseNum;
+    private Long EnterpriseNum;
 
     @Column(name = "enterprise_name", nullable = false)
     private String EnterpriseName;

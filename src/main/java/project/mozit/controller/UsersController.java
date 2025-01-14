@@ -7,7 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
-import project.mozit.dto.UsersDto;
+import project.mozit.dto.UsersDTO;
 import project.mozit.service.SignUpService;
 
 import java.util.HashMap;
@@ -21,7 +21,7 @@ public class UsersController {
     private SignUpService signUpService;
 
     @PostMapping("/signup")
-    public Map<String, String> joinProcess(@RequestBody UsersDto.Post usersDto){
+    public Map<String, String> joinProcess(@RequestBody UsersDTO.Post usersDto){
         System.out.println("joinProc accessed with data: " + usersDto.getUserName());
         System.out.println("joinProc accessed with data: " + usersDto.getUserPwd());
 

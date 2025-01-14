@@ -1,8 +1,9 @@
 package project.mozit.dto;
 
 import lombok.Data;
+import project.mozit.domain.Enterprises;
 
-public class UsersDto {
+public class UsersDTO {
 
     @Data
     public static class Post{
@@ -10,7 +11,7 @@ public class UsersDto {
         private String userName;
         private String userPwd;
         private String userEmail;
-        private String enterpriseNum;
+        private Enterprises enterpriseNum;
     }
 
     @Data
@@ -24,6 +25,6 @@ public class UsersDto {
         private String userId;
         private String userName;
         private String userEmail;
-        private String enterpriseNum;
+        private Enterprises enterpriseNum;
     }
 }
