@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup Form</title>
+</head>
+<body>
+<form id="signupForm">
+    <input type="text" id="userId" name="userId" placeholder="UserId" required />
+    <input type="password" id="userPwd" name="userPwd" placeholder="Password" required />
+    <input type="text" id="userName" name="userName" placeholder="UserName" required />
+    <input type="text" id="userEmail" name="userEmail" placeholder="Email" required />
+    <input type="number" id="enterpriseNum" name="enterpriseNum" placeholder="EnterpriseNum" required />
+    <button type="button" onclick="submitForm()">Submit</button>
+</form>
+
+<script>
+    function submitForm() {
+        // 폼 데이터 가져오기
+        const userId = document.getElementById('userId').value;
+        const userPwd = document.getElementById('userPwd').value;
+        const userName = document.getElementById('userName').value;
+        const userEmail = document.getElementById('userEmail').value;
+        const enterpriseNum = document.getElementById('enterpriseNum').value;
+
+        // JSON 데이터 생성
+        const jsonData = {
+            userId: userId,
+            userPwd: userPwd,
+            userName: userName,
+            userEmail: userEmail,
+            enterpriseNum: {
+                enterpriseNum: enterpriseNum
+            }
+        };
+
+        // Ajax 요청 (JSON 형식으로 데이터 전송)
+        fetch('http://localhost:8080/users/signup', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(jsonData)
+        })
+        .then(response => {
+            if (response.redirected) {
+                // 서버가 리디렉션하면 해당 URL로 이동
+                window.location.href = response.url;
+            } else {
+                return response.json(); // JSON 응답 처리
+            }
+        })
+        .then(data => {
+            if (data) {
+                console.log('Success:', data);
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            alert('Signup failed!');
+        });
+    }
+</script>
+</body>
+</html>

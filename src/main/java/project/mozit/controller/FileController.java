@@ -61,7 +61,7 @@ public class FileController {
     }
 
     @GetMapping("/download/{fileName}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable String fileName) {
+    public ResponseEntity<Resource> downloadFile(@PathVariable("fileName") String fileName) {
         try {
             // 파일 경로 설정
             Path filePath = Paths.get(UPLOAD_DIR, fileName);

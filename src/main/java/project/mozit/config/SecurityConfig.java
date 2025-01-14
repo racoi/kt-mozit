@@ -22,7 +22,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers(new AntPathRequestMatcher("/**")).permitAll()
+                        .requestMatchers("/**").permitAll()
                 )
 
                 .csrf(csrf -> csrf
@@ -30,6 +30,7 @@ public class SecurityConfig {
                 )
 
                 .formLogin((auth) -> auth
+                        .loginPage("/users/login")
                         .loginProcessingUrl("/users/loginProc")
                         .successHandler((request, response, authentication) -> {
                             response.setContentType("application/json;charset=UTF-8");
@@ -60,6 +61,7 @@ public class SecurityConfig {
 
                 .sessionManagement((auth) -> auth
                         .sessionFixation().changeSessionId());
+        ;
         return http.build();
     }
 }

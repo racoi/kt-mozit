@@ -23,9 +23,6 @@ public class Users {
     @Column(name = "user_email", nullable = false)
     private String userEmail;
 
-    @Column(name = "user_role", nullable = false)
-    private String userRole;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "enterprise_num")
     private Enterprises enterpriseNum;
