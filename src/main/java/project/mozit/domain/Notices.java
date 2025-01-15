@@ -3,6 +3,7 @@ package project.mozit.domain;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -15,8 +16,12 @@ public class Notices {
     private Long noticeNum;
 
     @CreationTimestamp
-    @Column(name = "timestamp")
-    private LocalDateTime timestamp;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @Column(name = "notice_title", nullable = false)
     private String noticeTitle;

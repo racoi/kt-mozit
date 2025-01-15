@@ -26,7 +26,7 @@ public class SecurityConfig {
                 )
 
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/h2-console/**", "/users/**", "/edit/upload", "/questions/**", "/answer/**")
+                        .ignoringRequestMatchers("/h2-console/**", "/users/**", "/api/upload", "/questions/**", "/answer/**", "/notices/**", "/faqs/**")
                 )
 
                 .formLogin((auth) -> auth
