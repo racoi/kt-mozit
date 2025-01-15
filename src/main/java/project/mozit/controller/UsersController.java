@@ -35,7 +35,6 @@ public class UsersController {
 
     @GetMapping("/signup")
     public String signupP(){
-
         return "signup";
     }
 

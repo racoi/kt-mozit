@@ -11,7 +11,6 @@
 <form th:action="@{/users/loginProc}" method="post" name="loginForm">
     <input id="username" type="text" name="username" placeholder="id" required/>
     <input id="password" type="password" name="password" placeholder="password" required/>
-    <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
     <input type="submit" value="Login"/>
 </form>
 </body>

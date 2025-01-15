@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import project.mozit.domain.Answers;
 import project.mozit.domain.Questions;
+import project.mozit.domain.Users;
 import project.mozit.dto.QuestionsDTO;
 import project.mozit.mapper.QuestionsMapper;
 import project.mozit.repository.AnswersRepository;
@@ -51,4 +52,27 @@ public class QuestionsService {
     public Questions saveQuestion(Questions question){
         return questionsRepository.save(question);
     }
+
+    public QuestionsDTO.UserDTO convertUserToDTO(Users user) {
+        QuestionsDTO.UserDTO userDTO = new QuestionsDTO.UserDTO();
+        userDTO.setUserNum(user.getUserNum());
+        userDTO.setUserId(user.getUserId());
+        userDTO.setUserName(user.getUserName());
+        userDTO.setUserEmail(user.getUserEmail());
+        return userDTO;
+    }
+
+    public QuestionsDTO.Response convertToResponse(Questions question) {
+        QuestionsDTO.Response response = new QuestionsDTO.Response();
+        response.setQuestionNum(question.getQuestionNum());
+        response.setTimestamp(question.getTimestamp());
+        response.setQuestionTitle(question.getQuestionTitle());
+        response.setQuestionDetail(question.getQuestionDetail());
+        response.setQuestionType(question.getQuestionType());
+        response.setQuestionState(question.getQuestionState());
+        response.setQuestionImage(question.getQuestionImage());
+        response.setUserNum(convertUserToDTO(question.getUserNum()));  // UserDTO로 변환
+        return response;
+    }
+
 }

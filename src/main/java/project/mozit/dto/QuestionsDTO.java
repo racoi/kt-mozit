@@ -26,7 +26,7 @@ public class QuestionsDTO {
         private Questions.QuestionType questionType;
         private Boolean questionState;
         private String questionImage;
-        private Users userNum;
+        private UserDTO  userNum;
 
         private AnswerResponse answerResponse;
 
@@ -36,5 +36,13 @@ public class QuestionsDTO {
             private LocalDateTime timestamp;
             private String answerDetail;
         }
+    }
+
+    @Data
+    public static class UserDTO {
+        private Long userNum;
+        private String userId;
+        private String userName;
+        private String userEmail;
     }
 }

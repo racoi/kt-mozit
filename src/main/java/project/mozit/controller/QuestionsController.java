@@ -32,6 +32,10 @@ public class QuestionsController {
 
     @GetMapping("/my")
     public List<QuestionsDTO.Response> getMyQuestions(@AuthenticationPrincipal CustomUserDetails userDetails){
+        if (userDetails == null) {
+            throw new IllegalArgumentException("User is not authenticated");
+        }
+
         String userId = userDetails.getUsername();
         return questionsService.findQuestionsByUser(userId);
     }

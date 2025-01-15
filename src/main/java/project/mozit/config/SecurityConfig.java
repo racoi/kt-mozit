@@ -1,17 +1,39 @@
 package project.mozit.config;
 
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import project.mozit.filter.JWTFilter;
+import project.mozit.filter.LoginFilter;
+import project.mozit.repository.UsersRepository;
+import project.mozit.util.JWTUtil;
+import project.mozit.util.RedisUtil;
 
 @EnableWebSecurity
 @Configuration
+@AllArgsConstructor
 public class SecurityConfig {
+
+    private final AuthenticationConfiguration authenticationConfiguration;
+    private final JWTUtil jwtUtil;
+    private final RedisUtil redisUtil;
+    private final UsersRepository usersRepository;
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+
+        return configuration.getAuthenticationManager();
+    }
+
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder(){
 
@@ -25,24 +47,21 @@ public class SecurityConfig {
                         .requestMatchers("/**").permitAll()
                 )
 
-                .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/h2-console/**", "/users/**", "/api/upload", "/questions/**", "/answer/**", "/notices/**", "/faqs/**")
-                )
+                .csrf((csrf) -> csrf.disable())
 
-                .formLogin((auth) -> auth
-                        .loginPage("/users/login")
-                        .loginProcessingUrl("/users/loginProc")
-                        .successHandler((request, response, authentication) -> {
-                            response.setContentType("application/json;charset=UTF-8");
-                            response.getWriter().write("{\"message\": \"Login successful\"}");
-                            response.getWriter().flush();
-                        })
-                        .permitAll()
-                )
+                .formLogin((auth) -> auth.disable())
+
+                .addFilterBefore(new JWTFilter(jwtUtil, usersRepository), LoginFilter.class)
+
+                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, redisUtil), UsernamePasswordAuthenticationFilter.class)
 
                 .logout((auth) -> auth
                         .logoutUrl("/users/logout")
                         .logoutSuccessHandler((request, response, authentication) -> {
+                            String username = request.getHeader("username");
+                            if (username != null) {
+                                redisUtil.deleteData(username);
+                            }
                             response.setContentType("application/json;charset=UTF-8");
                             response.getWriter().write("{\"message\": \"Logout successful\"}");
                             response.getWriter().flush();
@@ -54,13 +73,9 @@ public class SecurityConfig {
                                 XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN))
                 )
 
-                .sessionManagement((auth) -> auth
-                        .maximumSessions(1)
-                        .maxSessionsPreventsLogin(true)
+                .sessionManagement((session) -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-
-                .sessionManagement((auth) -> auth
-                        .sessionFixation().changeSessionId());
         ;
         return http.build();
     }
