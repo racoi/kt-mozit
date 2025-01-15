@@ -4,34 +4,207 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>동영상 업로드</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+
+        .popup {
+            display: none; /* 초기에는 숨김 */
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #e0e0ff;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            width: 400px;
+        }
+
+        .popup-header {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .drag-drop-area {
+            border: 2px dashed #bbb;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .button {
+            background-color: #4CAF50; /* Green */
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .button:hover {
+            background-color: #45a049;
+        }
+
+        #videoPlayer {
+            width: 100%; /* 부모 요소의 100% 너비 */
+            height: auto; /* 자동 높이 조정 */
+            max-width: 800px; /* 최대 너비 설정 (원하는 크기로 조정 가능) */
+            margin-top: 20px;
+            display: block; /* 항상 표시되도록 수정 */
+        }
+
+        .file-name {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .no-video {
+            text-align: center;
+            color: #aaa;
+            font-size: 16px;
+        }
+    </style>
 </head>
 <body>
-<h1>동영상 업로드</h1>
-<form id="uploadForm" action="/api/upload" method="post" enctype="multipart/form-data">
-    <label for="videoFile">동영상 파일 선택:</label>
-    <input type="file" id="videoFile" name="videoFile" accept="video/*" required>
-    <button type="submit">업로드</button>
-</form>
 
-<h2>업로드 후 다운로드</h2>
-<form id="downloadForm" onsubmit="downloadFile(event)">
-    <label for="fileName">다운로드할 파일 이름:</label>
-    <input type="text" id="fileName" name="fileName" required>
-    <button type="submit">다운로드</button>
-</form>
+<h1>동영상 업로드</h1>
+<button class="button" onclick="showPopup()">파일 업로드</button>
+
+<div class="popup" id="uploadPopup">
+    <div class="popup-header">
+        <h2>파일 업로드</h2>
+        <button onclick="closePopup()">닫기</button>
+    </div>
+    <div class="drag-drop-area" id="dragDropArea">
+        <p>Drag & Drop</p>
+        <p>또는</p>
+        <input type="file" id="videoFile" accept="video/*" style="display: none;" onchange="handleFileSelect(event)">
+        <button class="button" onclick="document.getElementById('videoFile').click()">파일 첨부</button>
+        <div class="file-name" id="fileNameDisplay">선택된 파일: 없음</div> <!-- 파일 이름 표시 영역 -->
+    </div>
+    <button class="button" id="uploadButton" onclick="uploadVideo()">업로드</button>
+</div>
+
+<video id="videoPlayer" controls>
+    <source id="videoSource" src="" type="video/mp4">
+    브라우저가 동영상을 지원하지 않습니다.
+</video>
+<div class="no-video" id="noVideoMessage">업로드된 동영상이 없습니다.</div>
+
+<h2>편집 시작하기</h2>
+<button id="editButton" onclick="startEditing()">편집 시작하기</button>
+
+<h3>업로드 후 다운로드</h3>
+<button id="downloadButton" onclick="downloadFile()">다운로드</button>
 
 <script>
-    function downloadFile(event) {
-        event.preventDefault(); // 기본 폼 제출 방지
-        const fileName = document.getElementById("fileName").value;
+    let currentFileName = ''; // 저장된 파일 이름을 여기에 저장
 
-        // 동적으로 URL 생성 후 리다이렉트
-        if (fileName) {
-            window.location.href = `/api/download/${encodeURIComponent(fileName)}`;
+    function showPopup() {
+        document.getElementById('uploadPopup').style.display = 'block';
+    }
+
+    function closePopup() {
+        document.getElementById('uploadPopup').style.display = 'none';
+    }
+
+    const dragDropArea = document.getElementById('dragDropArea');
+    const videoFileInput = document.getElementById('videoFile');
+    const fileNameDisplay = document.getElementById('fileNameDisplay');
+    const videoPlayer = document.getElementById('videoPlayer');
+    const noVideoMessage = document.getElementById('noVideoMessage');
+
+    dragDropArea.addEventListener('dragover', (event) => {
+        event.preventDefault();
+        dragDropArea.style.borderColor = '#4CAF50'; // 드래그할 때 테두리 색상 변경
+    });
+
+    dragDropArea.addEventListener('dragleave', () => {
+        dragDropArea.style.borderColor = '#bbb'; // 드래그를 떠날 때 테두리 색상 복원
+    });
+
+    dragDropArea.addEventListener('drop', (event) => {
+        event.preventDefault();
+        dragDropArea.style.borderColor = '#bbb'; // 테두리 색상 복원
+        videoFileInput.files = event.dataTransfer.files; // 드롭한 파일을 파일 입력에 설정
+        handleFileSelect({ target: videoFileInput }); // 파일 선택 처리
+    });
+
+    function handleFileSelect(event) {
+        const fileName = event.target.files[0] ? event.target.files[0].name : '없음';
+        fileNameDisplay.textContent = `선택된 파일: ${fileName}`; // 팝업 내에 파일 이름 표시
+        currentFileName = fileName; // 현재 파일 이름 저장
+    }
+
+    function uploadVideo() {
+    const fileInput = document.getElementById('videoFile');
+    if (fileInput.files.length === 0) {
+        alert("파일을 선택하세요.");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('videoFile', fileInput.files[0]);
+
+    fetch('/edit/upload', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('업로드 실패');
+        }
+        return response.text(); // UUID 포함 파일 이름 반환
+    })
+    .then(data => {
+        console.log(data);
+        currentFileName = data.trim(); // 반환된 파일 이름 저장 (공백 제거)
+        alert("업로드 성공: " + currentFileName);
+        closePopup();
+
+        // 동영상 소스 설정 및 플레이어 표시
+        const videoURL = URL.createObjectURL(fileInput.files[0]);
+        document.getElementById('videoSource').src = videoURL;
+        videoPlayer.style.display = 'block'; // 플레이어 표시
+        videoPlayer.load(); // 동영상 로드
+        videoPlayer.play(); // 자동 재생
+        noVideoMessage.style.display = 'none'; // 동영상이 있을 때 메시지 숨김
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert(error.message);
+    });
+}
+
+    function startEditing() {
+        if (currentFileName) {
+            alert(`편집을 시작합니다: ${currentFileName}`);
+            // 편집 기능 구현 부분
         } else {
-            alert("파일 이름을 입력하세요.");
+            alert("업로드된 동영상이 없습니다.");
+        }
+    }
+
+    function downloadFile() {
+        if (currentFileName) {
+            window.location.href = `/edit/download/${encodeURIComponent(currentFileName)}`; // UUID 포함 파일 이름 사용
+        } else {
+            alert("업로드된 동영상이 없습니다.");
         }
     }
 </script>
+
 </body>
 </html>
