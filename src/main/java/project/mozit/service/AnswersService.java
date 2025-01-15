@@ -29,9 +29,12 @@ public class AnswersService {
         return saveAnswer(answer);
     }
 
+    @Transactional
     public void deleteAnswer(Long id){
         Answers answer = answersRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 답변입니다. ID: " + id));
+        Questions question = answer.getQuestionNum();
+        question.setQuestionState(false);
         answersRepository.delete(answer);
     }
 

@@ -24,6 +24,7 @@ public class QuestionsDTO {
         private String questionTitle;
         private String questionDetail;
         private Questions.QuestionType questionType;
+        private Boolean questionState;
         private String questionImage;
         private Users userNum;
 
