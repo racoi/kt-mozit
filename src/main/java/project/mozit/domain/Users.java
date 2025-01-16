@@ -1,5 +1,6 @@
 package project.mozit.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -23,6 +24,7 @@ public class Users {
     @Column(name = "user_email", nullable = false)
     private String userEmail;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "enterprise_num")
     private Enterprises enterpriseNum;

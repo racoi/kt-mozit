@@ -14,11 +14,36 @@ import project.mozit.dto.QuestionsDTO.UserDTO;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-01-16T15:32:37+0900",
+    date = "2025-01-16T16:46:55+0900",
     comments = "version: 1.4.1.Final, compiler: javac, environment: Java 17.0.13 (Eclipse Adoptium)"
 )
 @Component
 public class QuestionsMapperImpl implements QuestionsMapper {
+
+    @Override
+    public Response entityToResponse(Questions question, Answers answer) {
+        if ( question == null && answer == null ) {
+            return null;
+        }
+
+        Response response = new Response();
+
+        if ( question != null ) {
+            response.setQuestionNum( question.getQuestionNum() );
+            response.setTimestamp( question.getTimestamp() );
+            response.setUserNum( usersToUserDTO( question.getUserNum() ) );
+            response.setQuestionTitle( question.getQuestionTitle() );
+            response.setQuestionDetail( question.getQuestionDetail() );
+            response.setQuestionType( question.getQuestionType() );
+            response.setQuestionState( question.getQuestionState() );
+            response.setQuestionImage( question.getQuestionImage() );
+        }
+        if ( answer != null ) {
+            response.setAnswerResponse( answerToResponse( answer ) );
+        }
+
+        return response;
+    }
 
     @Override
     public Questions PostDTOToEntity(Post post) {
@@ -32,34 +57,8 @@ public class QuestionsMapperImpl implements QuestionsMapper {
         questions.setQuestionDetail( post.getQuestionDetail() );
         questions.setQuestionType( post.getQuestionType() );
         questions.setQuestionImage( post.getQuestionImage() );
-        questions.setUserNum( post.getUserNum() );
 
         return questions;
-    }
-
-    @Override
-    public Response entityToResponse(Questions question, Answers answer) {
-        if ( question == null && answer == null ) {
-            return null;
-        }
-
-        Response response = new Response();
-
-        if ( question != null ) {
-            response.setQuestionNum( question.getQuestionNum() );
-            response.setTimestamp( question.getTimestamp() );
-            response.setQuestionTitle( question.getQuestionTitle() );
-            response.setQuestionDetail( question.getQuestionDetail() );
-            response.setQuestionType( question.getQuestionType() );
-            response.setQuestionState( question.getQuestionState() );
-            response.setQuestionImage( question.getQuestionImage() );
-            response.setUserNum( usersToUserDTO( question.getUserNum() ) );
-        }
-        if ( answer != null ) {
-            response.setAnswerResponse( answerToResponse( answer ) );
-        }
-
-        return response;
     }
 
     @Override

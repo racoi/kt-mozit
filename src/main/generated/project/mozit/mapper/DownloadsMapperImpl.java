@@ -7,7 +7,7 @@ import project.mozit.dto.DownloadsDTO;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-01-16T15:44:51+0900",
+    date = "2025-01-16T16:39:59+0900",
     comments = "version: 1.4.1.Final, compiler: javac, environment: Java 17.0.13 (Eclipse Adoptium)"
 )
 @Component

@@ -10,16 +10,13 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface QuestionsMapper {
-
-    @Mapping(target = "questionNum", ignore = true)
-    @Mapping(target = "timestamp", ignore = true)
-    @Mapping(target = "questionState", ignore = true)
-    Questions PostDTOToEntity(QuestionsDTO.Post post);
-
     @Mapping(source = "question.questionNum", target = "questionNum")
     @Mapping(source = "question.timestamp", target = "timestamp")
+    @Mapping(source = "question.userNum", target = "userNum")
     @Mapping(source = "answer", target = "answerResponse")
     QuestionsDTO.Response entityToResponse(Questions question, Answers answer);
+
+    Questions PostDTOToEntity(QuestionsDTO.Post post);
 
     QuestionsDTO.Response.AnswerResponse answerToResponse(Answers answer);
 

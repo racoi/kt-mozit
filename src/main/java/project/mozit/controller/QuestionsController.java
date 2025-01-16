@@ -20,8 +20,8 @@ public class QuestionsController {
     public final QuestionsService questionsService;
 
     @PostMapping
-    public ResponseEntity<Questions> insertQuestion(@RequestBody QuestionsDTO.Post dto){
-        Questions savedQuestion = questionsService.insertQuestion(dto);
+    public ResponseEntity<Questions> insertQuestion(@RequestHeader("Authorization") String token, @RequestBody QuestionsDTO.Post dto){
+        Questions savedQuestion = questionsService.insertQuestion(token, dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedQuestion);
     }
 
@@ -31,12 +31,8 @@ public class QuestionsController {
     }
 
     @GetMapping("/my")
-    public List<QuestionsDTO.Response> getMyQuestions(@AuthenticationPrincipal CustomUserDetails userDetails){
-        if (userDetails == null) {
-            throw new IllegalArgumentException("User is not authenticated");
-        }
-
-        String userId = userDetails.getUsername();
+    public List<QuestionsDTO.Response> getMyQuestions(@RequestHeader("Authorization") String token){
+        String userId = questionsService.getUsername(token);
         return questionsService.findQuestionsByUser(userId);
     }
     

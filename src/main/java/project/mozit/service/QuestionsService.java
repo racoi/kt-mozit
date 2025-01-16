@@ -10,6 +10,8 @@ import project.mozit.dto.QuestionsDTO;
 import project.mozit.mapper.QuestionsMapper;
 import project.mozit.repository.AnswersRepository;
 import project.mozit.repository.QuestionsRepository;
+import project.mozit.repository.UsersRepository;
+import project.mozit.util.JWTUtil;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,10 +22,23 @@ public class QuestionsService {
 
     private final QuestionsRepository questionsRepository;
     private final AnswersRepository answersRepository;
+    private final UsersRepository usersRepository;
     private final QuestionsMapper questionsMapper;
+    public final JWTUtil jwtUtil;
 
-    public Questions insertQuestion(QuestionsDTO.Post dto){
+    public String getUsername(String token){
+        return jwtUtil.getUsername(token.replace("Bearer ", ""));
+    }
+
+    public Questions insertQuestion(String token, QuestionsDTO.Post dto){
+        String userId = getUsername(token);
+        Users userNum = usersRepository.findByUserId(userId);
+        if (userNum == null) {
+            throw new EntityNotFoundException("해당 유저를 찾을 수 없습니다. ID: " + userId);
+        }
+
         Questions question = questionsMapper.PostDTOToEntity(dto);
+        question.setUserNum(userNum);
         return saveQuestion(question);
     }
 

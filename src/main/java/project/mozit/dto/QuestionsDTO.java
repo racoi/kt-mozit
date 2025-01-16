@@ -14,7 +14,6 @@ public class QuestionsDTO {
         private String questionDetail;
         private Questions.QuestionType questionType;
         private String questionImage;
-        private Users userNum;
     }
 
     @Data
