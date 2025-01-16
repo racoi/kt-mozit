@@ -34,7 +34,7 @@ public class UsersController {
 
     @GetMapping("/logout-success")
     public ResponseEntity<String> logoutSuccess() {
-        return ResponseEntity.ok("Logout successful");
+        return ResponseEntity.ok("로그아웃 성공");
     }
 
     @GetMapping("/check-id")
