@@ -19,7 +19,7 @@ public class EditController {
         this.editService = editService;
     }
 
-    // 파일 업로드 처리
+    // 파일 업로드
     @PostMapping("/upload")
     public ResponseEntity<String> handleFileUpload(@RequestParam("videoFile") MultipartFile file) {
         if (file == null || file.isEmpty()) {
@@ -36,7 +36,27 @@ public class EditController {
         }
     }
 
-    // 파일 다운로드 처리
+
+
+
+    // 편집 시작
+    @PostMapping("/start-editing")
+    public ResponseEntity<String> startEditing(@RequestParam("videoFileName") String videoFileName) {
+
+        try {
+//            editService.sendVideoPathToFastAPI(videoFileName);
+
+            String thumbnail = "/path/to/thumbnail.jpg";
+            editService.saveStartEditing(thumbnail);
+            return ResponseEntity.ok("편집 시작 요청이 성공적으로 전송되었습니다.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("편집 시작 요청 실패: " + e.getMessage());
+        }
+    }
+
+    // 파일 다운로드
     @GetMapping("/download/{fileName}")
     public ResponseEntity<Resource> downloadFile(@PathVariable("fileName") String fileName) {
         if (fileName == null || fileName.isBlank()) {
