@@ -1,9 +1,7 @@
 package project.mozit.mapper;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.*;
+import project.mozit.domain.Enterprises;
 import project.mozit.domain.Users;
 import project.mozit.dto.UsersDTO;
 
@@ -13,6 +11,7 @@ import java.util.List;
 public interface UsersMapper {
 
     @Mapping(target = "userNum", ignore = true)
+    @Mapping(target = "enterpriseNum", source = "enterpriseNum", qualifiedByName = "mapEnterpriseNum")
     Users PostDTOToEntity(UsersDTO.Post post);
 
     @Mapping(target = "userNum", ignore = true)
@@ -25,4 +24,11 @@ public interface UsersMapper {
     UsersDTO.Response entityToResponse(Users user);
 
     List<UsersDTO.Response> usersToResponse(List<Users> users);
+
+    @Named("mapEnterpriseNum")
+    default Enterprises mapEnterpriseNum(Long enterpriseNum) {
+        Enterprises enterprise = new Enterprises();
+        enterprise.setEnterpriseNum(enterpriseNum);
+        return enterprise;
+    }
 }

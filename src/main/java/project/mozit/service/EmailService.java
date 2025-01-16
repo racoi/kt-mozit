@@ -2,6 +2,7 @@ package project.mozit.service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -26,8 +27,8 @@ public class EmailService {
     private String senderEmail;
 
     private String createCode() {
-        int leftLimit = 48; // number '0'
-        int rightLimit = 122; // alphabet 'z'
+        int leftLimit = 48;
+        int rightLimit = 122;
         int targetStringLength = 6;
         Random random = new Random();
 

@@ -11,7 +11,11 @@ public class UsersDTO {
         private String userName;
         private String userPwd;
         private String userEmail;
-        private Enterprises enterpriseNum;
+
+        private Long enterpriseNum;
+        private String enterpriseName;
+        private String enterpriseAddr;
+        private String enterpriseCall;
     }
 
     @Data

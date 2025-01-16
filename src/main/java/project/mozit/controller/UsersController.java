@@ -3,8 +3,7 @@ package project.mozit.controller;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -17,47 +16,28 @@ import project.mozit.dto.UsersDTO;
 import project.mozit.service.EmailService;
 import project.mozit.service.SignUpService;
 
-import java.util.HashMap;
-import java.util.Map;
 
-@Controller
-@RequiredArgsConstructor
+@RestController
+@AllArgsConstructor
 @RequestMapping("/users")
 public class UsersController {
 
     private final SignUpService signUpService;
     private final EmailService emailService;
 
-    @GetMapping("/login")
-    public String loginP(){
-        return "login";
-    }
-
-    @GetMapping("/signup")
-    public String signupP(){
-        return "signup";
-    }
-
     @PostMapping("/signup")
-    public String joinProcess(@RequestBody UsersDTO.Post usersDto){
+    public ResponseEntity<String> joinProcess(@RequestBody UsersDTO.Post usersDto){
         signUpService.joinProcess(usersDto);
 
-        return "redirect:/users/login";
+        return ResponseEntity.status(HttpStatus.CREATED).body("회원가입이 완료되었습니다.");
     }
 
-    @GetMapping("logout")
-    public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response) throws Exception {
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(authentication != null) {
-            new SecurityContextLogoutHandler().logout(request, response, authentication);
-        }
-
+    @GetMapping("/logout-success")
+    public ResponseEntity<String> logoutSuccess() {
         return ResponseEntity.ok("Logout successful");
     }
 
     @GetMapping("/check-id")
-    @ResponseBody
     public ResponseEntity<String> checkUserId(@RequestParam("userId") String userId) {
         boolean isUserExists = signUpService.checkUserId(userId);
 
@@ -69,7 +49,6 @@ public class UsersController {
     }
 
     @PostMapping("/send-email")
-    @ResponseBody
     public ResponseEntity<String> sendmail(@RequestBody EmailDTO emailDto) throws MessagingException {
         try {
             System.out.println("EmailController.mailSend() " + emailDto.getMail());
@@ -83,7 +62,6 @@ public class UsersController {
     }
 
     @PostMapping("/verify-email")
-    @ResponseBody
     public ResponseEntity<String> verifyEmail(@RequestBody EmailDTO emailDto) {
         boolean isVerify = emailService.verifyEmailCode(emailDto.getMail(), emailDto.getVerifyCode());
 

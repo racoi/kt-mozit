@@ -11,7 +11,7 @@ import project.mozit.dto.FaqsDTO.Response;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-01-15T17:33:21+0900",
+    date = "2025-01-16T09:45:18+0900",
     comments = "version: 1.4.1.Final, compiler: javac, environment: Java 17.0.13 (Eclipse Adoptium)"
 )
 @Component

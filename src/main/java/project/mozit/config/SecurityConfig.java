@@ -62,9 +62,7 @@ public class SecurityConfig {
                             if (username != null) {
                                 redisUtil.deleteData(username);
                             }
-                            response.setContentType("application/json;charset=UTF-8");
-                            response.getWriter().write("{\"message\": \"Logout successful\"}");
-                            response.getWriter().flush();
+                            response.sendRedirect("/users/logout-success");
                         })
                 )
 

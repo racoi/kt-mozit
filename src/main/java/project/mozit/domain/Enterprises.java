@@ -10,14 +10,14 @@ import lombok.Data;
 public class Enterprises {
 
     @Id
-    private Long EnterpriseNum;
+    private Long enterpriseNum;
 
     @Column(name = "enterprise_name", nullable = false)
-    private String EnterpriseName;
+    private String enterpriseName;
 
     @Column(name = "enterprise_addr", nullable = false)
-    private String EnterpriseAddr;
+    private String enterpriseAddr;
 
     @Column(name = "enterprise_call", nullable = false)
-    private String EnterpriseCall;
+    private String enterpriseCall;
 }

@@ -1,5 +1,6 @@
 package project.mozit.util;
 
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -8,7 +9,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class RedisUtil {
     private final StringRedisTemplate template;
 
