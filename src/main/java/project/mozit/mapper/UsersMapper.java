@@ -11,29 +11,23 @@ import java.util.List;
 public interface UsersMapper {
 
     @Mapping(target = "userNum", ignore = true)
-    @Mapping(target = "enterpriseNum", source = "enterpriseNum", qualifiedByName = "mapEnterpriseNum")
+    @Mapping(target = "userPwd", ignore = true)
     Users PostDTOToEntity(UsersDTO.Post post);
 
-    @Mapping(target = "userNum", ignore = true)
-    @Mapping(target = "userId", ignore = true)
-    @Mapping(target = "userName", ignore = true)
-    @Mapping(target = "userEmail", ignore = true)
-    @Mapping(target = "enterpriseNum", ignore = true)
-    void PatchDTOToEntity(UsersDTO.Patch patch, @MappingTarget Users user);
 
-    @Mapping(target = "enterpriseNum", source = "enterpriseNum", qualifiedByName = "mapToLong")
+    @Mapping(target = "enterpriseNum", source = "enterpriseNum.enterpriseNum")
+    @Mapping(target = "enterpriseName", source = "enterpriseNum.enterpriseName")
+    @Mapping(target = "enterpriseAddr", source = "enterpriseNum.enterpriseAddr")
+    @Mapping(target = "enterpriseCall", source = "enterpriseNum.enterpriseCall")
     UsersDTO.Response entityToResponse(Users user);
 
-    List<UsersDTO.Response> usersToResponse(List<Users> users);
-
-    @Named("mapEnterpriseNum")
     default Enterprises mapEnterpriseNum(Long enterpriseNum) {
+        if (enterpriseNum == null) return null;
         Enterprises enterprise = new Enterprises();
         enterprise.setEnterpriseNum(enterpriseNum);
         return enterprise;
     }
 
-    @Named("mapToLong")
     default Long mapToLong(Enterprises enterprise) {
         return enterprise != null ? enterprise.getEnterpriseNum() : null;
     }

@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import project.mozit.domain.Enterprises;
 import project.mozit.domain.Users;
 import project.mozit.dto.UsersDTO;
+import project.mozit.mapper.UsersMapper;
 import project.mozit.repository.UsersRepository;
 import project.mozit.util.JWTUtil;
 
@@ -16,42 +17,29 @@ public class MyService {
     private final JWTUtil jwtUtil;
     private final UsersRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final UsersMapper usersMapper;
+
+    private String extractUsernameFromToken(String token) {
+        return jwtUtil.getUsername(token.replace("Bearer ", ""));
+    }
 
     public boolean verifyPassword(String token, String inputPassword) {
-        String userid = jwtUtil.getUsername(token.replace("Bearer ", ""));
-
+        String userid = extractUsernameFromToken(token);
         Users user = userRepository.findByUserId(userid);
 
         return passwordEncoder.matches(inputPassword, user.getUserPwd());
     }
 
     public UsersDTO.Response getUserInfo(String token){
-        String username = jwtUtil.getUsername(token.replace("Bearer ", ""));
+        String username = extractUsernameFromToken(token);
         Users user = userRepository.findByUserId(username);
 
-        UsersDTO.Response response = new UsersDTO.Response();
-        response.setUserNum(user.getUserNum());
-        response.setUserId(user.getUserId());
-        response.setUserName(user.getUserName());
-        response.setUserEmail(user.getUserEmail());
-
-        if (user.getEnterpriseNum() != null) {
-            response.setEnterpriseNum(user.getEnterpriseNum().getEnterpriseNum());
-            Enterprises enterprise = user.getEnterpriseNum();
-            response.setEnterpriseNum(enterprise.getEnterpriseNum());
-            response.setEnterpriseName(enterprise.getEnterpriseName());
-            response.setEnterpriseAddr(enterprise.getEnterpriseAddr());
-            response.setEnterpriseCall(enterprise.getEnterpriseCall());
-        } else {
-            response.setEnterpriseNum(null);
-        }
-
-        return response;
+        return usersMapper.entityToResponse(user);
     }
 
     @Transactional
     public void updateUserInfo(String token, UsersDTO.Patch updateDto) {
-        String username = jwtUtil.getUsername(token.replace("Bearer ", ""));
+        String username = extractUsernameFromToken(token);
         Users user = userRepository.findByUserId(username);
 
         if (updateDto.getUserName() != null) {

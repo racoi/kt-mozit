@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import project.mozit.domain.Enterprises;
 import project.mozit.domain.Users;
 import project.mozit.dto.UsersDTO;
+import project.mozit.mapper.UsersMapper;
 import project.mozit.repository.EnterprisesRepository;
 import project.mozit.repository.UsersRepository;
 
@@ -19,6 +20,7 @@ public class UsersService {
     private final UsersRepository userRepository;
     private final EnterprisesRepository enterprisesRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final UsersMapper usersMapper;
 
     public void joinProcess(UsersDTO.Post usersDto){
 
@@ -39,12 +41,8 @@ public class UsersService {
                 });
 
 
-        Users data = new Users();
-
-        data.setUserId(usersDto.getUserId());
+        Users data = usersMapper.PostDTOToEntity(usersDto);
         data.setUserPwd(bCryptPasswordEncoder.encode(usersDto.getUserPwd()));
-        data.setUserName(usersDto.getUserName());
-        data.setUserEmail(usersDto.getUserEmail());
         data.setEnterpriseNum(enterprise);
 
         userRepository.save(data);

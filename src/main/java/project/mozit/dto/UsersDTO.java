@@ -32,6 +32,7 @@ public class UsersDTO {
         private String userId;
         private String userName;
         private String userEmail;
+
         private Long enterpriseNum;
         private String enterpriseName;
         private String enterpriseAddr;

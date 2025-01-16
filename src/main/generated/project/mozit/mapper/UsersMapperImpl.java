@@ -1,17 +1,15 @@
 package project.mozit.mapper;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
+import project.mozit.domain.Enterprises;
 import project.mozit.domain.Users;
-import project.mozit.dto.UsersDTO.Patch;
 import project.mozit.dto.UsersDTO.Post;
 import project.mozit.dto.UsersDTO.Response;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-01-16T14:18:02+0900",
+    date = "2025-01-16T15:56:07+0900",
     comments = "version: 1.4.1.Final, compiler: javac, environment: Java 17.0.13 (Eclipse Adoptium)"
 )
 @Component
@@ -25,22 +23,12 @@ public class UsersMapperImpl implements UsersMapper {
 
         Users users = new Users();
 
-        users.setEnterpriseNum( mapEnterpriseNum( post.getEnterpriseNum() ) );
         users.setUserId( post.getUserId() );
-        users.setUserPwd( post.getUserPwd() );
         users.setUserName( post.getUserName() );
         users.setUserEmail( post.getUserEmail() );
+        users.setEnterpriseNum( mapEnterpriseNum( post.getEnterpriseNum() ) );
 
         return users;
-    }
-
-    @Override
-    public void PatchDTOToEntity(Patch patch, Users user) {
-        if ( patch == null ) {
-            return;
-        }
-
-        user.setUserPwd( patch.getUserPwd() );
     }
 
     @Override
@@ -51,7 +39,10 @@ public class UsersMapperImpl implements UsersMapper {
 
         Response response = new Response();
 
-        response.setEnterpriseNum( mapToLong( user.getEnterpriseNum() ) );
+        response.setEnterpriseNum( userEnterpriseNumEnterpriseNum( user ) );
+        response.setEnterpriseName( userEnterpriseNumEnterpriseName( user ) );
+        response.setEnterpriseAddr( userEnterpriseNumEnterpriseAddr( user ) );
+        response.setEnterpriseCall( userEnterpriseNumEnterpriseCall( user ) );
         response.setUserNum( user.getUserNum() );
         response.setUserId( user.getUserId() );
         response.setUserName( user.getUserName() );
@@ -60,17 +51,63 @@ public class UsersMapperImpl implements UsersMapper {
         return response;
     }
 
-    @Override
-    public List<Response> usersToResponse(List<Users> users) {
+    private Long userEnterpriseNumEnterpriseNum(Users users) {
         if ( users == null ) {
             return null;
         }
-
-        List<Response> list = new ArrayList<Response>( users.size() );
-        for ( Users users1 : users ) {
-            list.add( entityToResponse( users1 ) );
+        Enterprises enterpriseNum = users.getEnterpriseNum();
+        if ( enterpriseNum == null ) {
+            return null;
         }
+        Long enterpriseNum1 = enterpriseNum.getEnterpriseNum();
+        if ( enterpriseNum1 == null ) {
+            return null;
+        }
+        return enterpriseNum1;
+    }
 
-        return list;
+    private String userEnterpriseNumEnterpriseName(Users users) {
+        if ( users == null ) {
+            return null;
+        }
+        Enterprises enterpriseNum = users.getEnterpriseNum();
+        if ( enterpriseNum == null ) {
+            return null;
+        }
+        String enterpriseName = enterpriseNum.getEnterpriseName();
+        if ( enterpriseName == null ) {
+            return null;
+        }
+        return enterpriseName;
+    }
+
+    private String userEnterpriseNumEnterpriseAddr(Users users) {
+        if ( users == null ) {
+            return null;
+        }
+        Enterprises enterpriseNum = users.getEnterpriseNum();
+        if ( enterpriseNum == null ) {
+            return null;
+        }
+        String enterpriseAddr = enterpriseNum.getEnterpriseAddr();
+        if ( enterpriseAddr == null ) {
+            return null;
+        }
+        return enterpriseAddr;
+    }
+
+    private String userEnterpriseNumEnterpriseCall(Users users) {
+        if ( users == null ) {
+            return null;
+        }
+        Enterprises enterpriseNum = users.getEnterpriseNum();
+        if ( enterpriseNum == null ) {
+            return null;
+        }
+        String enterpriseCall = enterpriseNum.getEnterpriseCall();
+        if ( enterpriseCall == null ) {
+            return null;
+        }
+        return enterpriseCall;
     }
 }
