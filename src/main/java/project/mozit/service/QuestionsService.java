@@ -12,6 +12,7 @@ import project.mozit.repository.AnswersRepository;
 import project.mozit.repository.QuestionsRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -39,9 +40,15 @@ public class QuestionsService {
         return questionsMapper.entityToResponse(question, answer);
     }
 
-    public List<QuestionsDTO.Response> findQuestions(){
+    public List<QuestionsDTO.Response> findQuestions() {
         List<Questions> questions = questionsRepository.findAll();
-        return questionsMapper.questionsToResponse(questions);
+
+        return questions.stream()
+                .map(question -> {
+                    Answers answer = answersRepository.findByQuestionNum(question).orElse(null);
+                    return questionsMapper.entityToResponse(question, answer);
+                })
+                .collect(Collectors.toList());
     }
 
     public List<QuestionsDTO.Response> findQuestionsByUser(String userId){
