@@ -21,6 +21,7 @@ public interface UsersMapper {
     @Mapping(target = "enterpriseNum", ignore = true)
     void PatchDTOToEntity(UsersDTO.Patch patch, @MappingTarget Users user);
 
+    @Mapping(target = "enterpriseNum", source = "enterpriseNum", qualifiedByName = "mapToLong")
     UsersDTO.Response entityToResponse(Users user);
 
     List<UsersDTO.Response> usersToResponse(List<Users> users);
@@ -30,5 +31,10 @@ public interface UsersMapper {
         Enterprises enterprise = new Enterprises();
         enterprise.setEnterpriseNum(enterpriseNum);
         return enterprise;
+    }
+
+    @Named("mapToLong")
+    default Long mapToLong(Enterprises enterprise) {
+        return enterprise != null ? enterprise.getEnterpriseNum() : null;
     }
 }

@@ -54,6 +54,10 @@ public class UsersService {
         return userRepository.existsByUserId(userId);
     }
 
+    public boolean checkUserEmail(String userEmail) {
+        return userRepository.existsByUserEmail(userEmail);
+    }
+
     public Optional<String> findUserId(String userEmail){
         return Optional.ofNullable(userRepository.findUserIdByUserEmail(userEmail));
     }

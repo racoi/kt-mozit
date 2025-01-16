@@ -46,6 +46,17 @@ public class UsersController {
         }
     }
 
+    @GetMapping("/check-email")
+    public ResponseEntity<String> checkUserEmail(@RequestParam("userEmail") String userEmail) {
+        boolean isUserExists = usersService.checkUserEmail(userEmail);
+
+        if (isUserExists) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 존재하는 이메일입니다."); // 409 Conflict
+        } else {
+            return ResponseEntity.status(HttpStatus.CREATED).body("사용 가능한 이메일입니다."); // 201 Created
+        }
+    }
+
     @PostMapping("/send-email")
     public ResponseEntity<String> sendmail(@RequestBody EmailDTO emailDto) throws MessagingException {
         try {

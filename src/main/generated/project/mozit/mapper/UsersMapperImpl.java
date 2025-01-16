@@ -11,7 +11,7 @@ import project.mozit.dto.UsersDTO.Response;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-01-16T09:45:18+0900",
+    date = "2025-01-16T14:18:02+0900",
     comments = "version: 1.4.1.Final, compiler: javac, environment: Java 17.0.13 (Eclipse Adoptium)"
 )
 @Component
@@ -51,11 +51,11 @@ public class UsersMapperImpl implements UsersMapper {
 
         Response response = new Response();
 
+        response.setEnterpriseNum( mapToLong( user.getEnterpriseNum() ) );
         response.setUserNum( user.getUserNum() );
         response.setUserId( user.getUserId() );
         response.setUserName( user.getUserName() );
         response.setUserEmail( user.getUserEmail() );
-        response.setEnterpriseNum( user.getEnterpriseNum() );
 
         return response;
     }
