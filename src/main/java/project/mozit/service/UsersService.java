@@ -1,19 +1,20 @@
 package project.mozit.service;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import project.mozit.domain.Enterprises;
 import project.mozit.domain.Users;
 import project.mozit.dto.UsersDTO;
 import project.mozit.repository.EnterprisesRepository;
 import project.mozit.repository.UsersRepository;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
-public class SignUpService {
+public class UsersService {
 
     private final UsersRepository userRepository;
     private final EnterprisesRepository enterprisesRepository;
@@ -52,4 +53,18 @@ public class SignUpService {
     public boolean checkUserId(String userId) {
         return userRepository.existsByUserId(userId);
     }
+
+    public Optional<String> findUserId(String userEmail){
+        return Optional.ofNullable(userRepository.findUserIdByUserEmail(userEmail));
+    }
+
+    @Transactional
+    public void updatePassword(String email, String newPassword) {
+        Users user = userRepository.findByUserEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("해당 이메일로 사용자를 찾을 수 없습니다."));
+
+        user.setUserPwd(bCryptPasswordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
 }

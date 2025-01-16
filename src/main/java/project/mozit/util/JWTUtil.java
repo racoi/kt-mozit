@@ -13,15 +13,18 @@ import java.util.Date;
 @Component
 public class JWTUtil {
     private final SecretKey secretKey;
+    private final Long TEMPORARY_TOKEN_EXPIRATION;
     private final Long ACCESS_TOKEN_EXPIRATION;
     private final Long REFRESH_TOKEN_EXPIRATION;
 
     public JWTUtil(
             @Value("${spring.jwt.secret}") String secret,
+            @Value("${spring.jwt.token.temporary-expiration-time}") Long temporaryExp,
             @Value("${spring.jwt.token.access-expiration-time}") Long accessExp,
             @Value("${spring.jwt.token.refresh-expiration-time}") Long refreshExp
     ) {
         this.secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
+        this.TEMPORARY_TOKEN_EXPIRATION = temporaryExp;
         this.ACCESS_TOKEN_EXPIRATION = accessExp;
         this.REFRESH_TOKEN_EXPIRATION = refreshExp;
     }
@@ -52,6 +55,16 @@ public class JWTUtil {
 
     public long getRefreshTokenExpiration() {
         return REFRESH_TOKEN_EXPIRATION;
+    }
+
+    public String createTemporalToken(String username, String role) {
+        return Jwts.builder()
+                .claim("username", username)
+                .claim("role", role)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + TEMPORARY_TOKEN_EXPIRATION))
+                .signWith(secretKey)
+                .compact();
     }
 
     public String createAccessToken(String username, String role) {
