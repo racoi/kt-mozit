@@ -39,31 +39,36 @@ public class EditController {
 
 
 
-    // 편집 시작
+    // 편집 시작-DB에 저장
     @PostMapping("/start-editing")
-    public ResponseEntity<String> startEditing(@RequestParam("videoFileName") String videoFileName) {
+    public ResponseEntity<Long> startEditing(@RequestParam("videoFileName") String videoFileName) {
 
         try {
 //            editService.sendVideoPathToFastAPI(videoFileName);
-
             String thumbnail = "/path/to/thumbnail.jpg";
-            editService.saveStartEditing(thumbnail);
-            return ResponseEntity.ok("편집 시작 요청이 성공적으로 전송되었습니다.");
+            Long editNum = editService.saveStartEditing(thumbnail);
+            return ResponseEntity.ok(editNum);// EDIT_NUM 반환
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("편집 시작 요청 실패: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
-    // 파일 다운로드
-    @GetMapping("/download/{fileName}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable("fileName") String fileName) {
+
+
+
+
+    // 파일 다운로드 및 DB에 저장
+    @PostMapping("/download")
+    public ResponseEntity<Resource> downloadFile(@RequestParam("fileName") String fileName,
+                                                 @RequestParam("editNum") Long editNum) {
         if (fileName == null || fileName.isBlank()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
 
         try {
+            // DB에 다운로드 정보 저장
+            editService.saveDownloadInfo(fileName, editNum);
             return editService.downloadFile(fileName);
         } catch (IOException e) {
             e.printStackTrace();

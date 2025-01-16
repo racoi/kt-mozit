@@ -9,8 +9,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import project.mozit.domain.Downloads;
 import project.mozit.domain.Edits;
 import project.mozit.domain.Users;
+import project.mozit.dto.DownloadsDTO;
+import project.mozit.mapper.DownloadsMapper;
+import project.mozit.repository.DownloadsRepository;
 import project.mozit.repository.EditsRepository;
 import project.mozit.repository.UsersRepository;
 //import project.mozit.client.dto.VideoPathRequest;
@@ -33,6 +37,12 @@ public class EditService {
 
     @Autowired
     private UsersRepository usersRepository;
+
+    @Autowired
+    private DownloadsRepository downloadsRepository;
+
+    @Autowired
+    private DownloadsMapper downloadsMapper;
 
 //    @Autowired
 //    private FastApiClient fastApiClient;
@@ -78,26 +88,42 @@ public class EditService {
     }
 */
 
-    // 편집 시작 및 DB에 저장
+    // 편집 시작 내용 DB에 저장
     @Transactional
-    public void saveStartEditing(String thumbnail) {
+    public Long  saveStartEditing(String thumbnail) {
         Edits edits = new Edits();
 
-        edits.setThumbnail(thumbnail); // FastAPI로부터 받은 썸네일 설정
-        //String thumbnail = "/path/to/thumbnail.jpg"; // 나중에 바꿔야 함.
-        edits.setThumbnail(thumbnail);
-
-        edits.setTimestamp(LocalDateTime.now()); // 현재 시간 설정
+        edits.setThumbnail(thumbnail); //1. 썸네일 경로
+        edits.setTimestamp(LocalDateTime.now()); // 2. 현재 시간 설정
 
         // 사용자 ID가 1인 사용자 조회(일단 임시로 ) 나중에 바꿔야 함.
-        Users user = usersRepository.findById(1L)
+        Users user = usersRepository.findById(1L)   //3. 사용자 id
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.")); // 사용자 존재 여부 확인
         edits.setUserNum(user); // Users 객체를 설정
 
         // DB에 저장
-        editsRepository.save(edits); // Edits 도메인 객체를 직접 저장
+        Edits savedEdits = editsRepository.save(edits); // Edits 도메인 객체를 직접 저장
         System.out.println(" 저장 성공: " + thumbnail);
+        return savedEdits.getEditNum(); // 저장된 EDIT_NUM 반환
     }
+
+
+    @Transactional
+    public void saveDownloadInfo(String fileName, Long editNum) {
+        Downloads downloads = new Downloads();
+        downloads.setFaceMosaic(false); // 하드코딩된
+        downloads.setHazardousList("칼, 총, 피"); // 하드코딩된
+        downloads.setPersonalList("민증, 여권"); // 하드코딩된
+
+        // EDIT_NUM 설정
+        Edits edit = new Edits();
+        edit.setEditNum(editNum);
+        downloads.setEditNum(edit);
+
+        // 다운로드 정보 저장
+        downloadsRepository.save(downloads);
+    }
+
 
 
     // 파일 다운로드 처리
