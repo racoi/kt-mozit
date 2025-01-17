@@ -1,6 +1,7 @@
 package project.mozit.service;
 
 //import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -13,10 +14,12 @@ import project.mozit.domain.Downloads;
 import project.mozit.domain.Edits;
 import project.mozit.domain.Users;
 import project.mozit.dto.DownloadsDTO;
+import project.mozit.dto.EditsDTO;
 import project.mozit.mapper.DownloadsMapper;
 import project.mozit.repository.DownloadsRepository;
 import project.mozit.repository.EditsRepository;
 import project.mozit.repository.UsersRepository;
+import project.mozit.util.JWTUtil;
 //import project.mozit.client.dto.VideoPathRequest;
 //import project.mozit.client.api.FastApiClient;
 
@@ -27,6 +30,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -47,6 +52,12 @@ public class EditService {
 //    @Autowired
 //    private FastApiClient fastApiClient;
 
+    @Autowired
+    private JWTUtil jwtUtil;
+
+    public String getUsername(String token){
+        return jwtUtil.getUsername(token.replace("Bearer ", ""));
+    }
     // 파일 업로드 처리
     public String uploadFile(MultipartFile file) throws IOException {
         if (file.isEmpty()) {
@@ -90,16 +101,17 @@ public class EditService {
 
     // 편집 시작 내용 DB에 저장
     @Transactional
-    public Long  saveStartEditing(String thumbnail) {
+    public Long  saveStartEditing(String thumbnail, String token) {
+        String userId = getUsername(token);
+        Users userNum = usersRepository.findByUserId(userId);
+        if (userNum == null) {
+            throw new EntityNotFoundException("해당 유저를 찾을 수 없습니다. ID: " + userId);
+        }
         Edits edits = new Edits();
 
         edits.setThumbnail(thumbnail); //1. 썸네일 경로
         edits.setTimestamp(LocalDateTime.now()); // 2. 현재 시간 설정
-
-        // 사용자 ID가 1인 사용자 조회(일단 임시로 ) 나중에 바꿔야 함.
-        Users user = usersRepository.findById(1L)   //3. 사용자 id
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.")); // 사용자 존재 여부 확인
-        edits.setUserNum(user); // Users 객체를 설정
+        edits.setUserNum(userNum); // Users 객체를 설정
 
         // DB에 저장
         Edits savedEdits = editsRepository.save(edits); // Edits 도메인 객체를 직접 저장
@@ -108,6 +120,7 @@ public class EditService {
     }
 
 
+    //다운로드시 모자이크 처리할 내용 DB에 저장.
     @Transactional
     public void saveDownloadInfo(String fileName, Long editNum) {
         Downloads downloads = new Downloads();
@@ -144,4 +157,37 @@ public class EditService {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + encodedFileName)
                 .body(resource);
     }
+
+
+
+    //내 작업 목록 가져오기
+    public List<EditsDTO> getEditsByUserId(String token) {
+        String userId = getUsername(token);
+        Users userNum = usersRepository.findByUserId(userId);
+
+        if (userNum == null) {
+            throw new EntityNotFoundException("해당 유저를 찾을 수 없습니다. ID: " + userId);
+        }
+
+        List<Edits> edits = editsRepository.findByUserNum(userNum);
+
+        // EditResponseDTO 리스트로 변환
+        List<EditsDTO> response = new ArrayList<>();
+        for (Edits edit : edits) {
+            // 다운로드 존재 여부 확인
+            boolean hasDownload = downloadsRepository.existsByEditNum(edit);
+
+            response.add(new EditsDTO(
+                    edit.getEditNum(),
+                    edit.getThumbnail(),
+                    edit.getTimestamp(),
+                    userNum.getUserNum(), // userNum 추가
+                    hasDownload // 다운로드 여부만 포함
+            ));
+        }
+
+        return response;
+    }
+
+
 }

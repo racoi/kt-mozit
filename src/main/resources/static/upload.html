@@ -108,6 +108,7 @@
 
 <h3>업로드 후 다운로드</h3>
 <button id="downloadButton" onclick="downloadFile()">다운로드</button>
+<button id="reEditButton" onclick="startReEditing()">다시 편집하기</button>
 
 <script>
     let currentFileName = ''; // 저장된 파일 이름을 여기에 저장
@@ -264,6 +265,37 @@
             alert(`다운로드 요청 실패: ${error.message}`);
         });
 }
+
+    function startReEditing() {
+    if (currentFileName) {
+        fetch('/edit/restart-editing', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                videoFileName: currentFileName, // videoFileName 파라미터 추가
+            }),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('다시 편집하기 요청 실패');
+            }
+            return response.text(); // 서버에서 EDIT_NUM 반환
+        })
+        .then(editNum => {
+            currentEditNum = editNum.trim(); // EDIT_NUM 저장
+            alert(`편집이 성공적으로 시작되었습니다. EDIT_NUM: ${currentEditNum}`);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert(`다시 편집하기 요청 실패: ${error.message}`);
+        });
+    } else {
+        alert("업로드된 동영상이 없습니다.");
+    }
+}
+
 
 </script>
 
