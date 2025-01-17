@@ -17,6 +17,10 @@ public class CustomUserDetails implements UserDetails {
         this.user = user;
     }
 
+    public String getFullName() {
+        return user.getUserName();
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
@@ -32,7 +36,6 @@ public class CustomUserDetails implements UserDetails {
     public String getUsername() {
         return user.getUserId();
     }
-
 
     @Override
     public boolean isAccountNonExpired() {

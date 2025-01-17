@@ -12,11 +12,16 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import project.mozit.filter.JWTFilter;
 import project.mozit.filter.LoginFilter;
 import project.mozit.repository.UsersRepository;
 import project.mozit.util.JWTUtil;
 import project.mozit.util.RedisUtil;
+
+import java.util.List;
 
 @EnableWebSecurity
 @Configuration
@@ -43,6 +48,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/**").permitAll()
                 )
@@ -55,16 +61,12 @@ public class SecurityConfig {
 
                 .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, redisUtil), UsernamePasswordAuthenticationFilter.class)
 
-                .logout((auth) -> auth
-                        .logoutUrl("/users/logout")
-                        .logoutSuccessHandler((request, response, authentication) -> {
-                            String username = request.getHeader("username");
-                            if (username != null) {
-                                redisUtil.deleteData(username);
-                            }
-                            response.sendRedirect("/users/logout-success");
-                        })
-                )
+//                .logout((auth) -> auth
+//                        .logoutUrl("/users/logout")
+//                        .logoutSuccessUrl("/users/logout-success")
+//                        .invalidateHttpSession(true) // 세션 무효화
+//                        .deleteCookies("refreshToken")
+//                )
 
                 .headers(headers -> headers
                         .addHeaderWriter(new XFrameOptionsHeaderWriter(
@@ -77,4 +79,18 @@ public class SecurityConfig {
         ;
         return http.build();
     }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 }
+

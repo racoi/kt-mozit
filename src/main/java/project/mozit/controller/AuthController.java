@@ -1,14 +1,16 @@
 package project.mozit.controller;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import project.mozit.util.JWTUtil;
 import project.mozit.util.RedisUtil;
+
+import java.util.Arrays;
+import java.util.Map;
 
 @RestController
 @RequestMapping("auth")
@@ -17,9 +19,24 @@ public class AuthController {
     private final JWTUtil jwtUtil;
     private final RedisUtil redisUtil;
 
+    public String getUsername(String token){
+        return jwtUtil.getUsername(token.replace("Bearer ", ""));
+    }
+
     @PostMapping("/refresh")
-    public ResponseEntity<?> refreshAccessToken(@RequestHeader("Refresh-Token") String refreshToken) {
+    public ResponseEntity<?> refreshAccessToken(HttpServletRequest request) {
         try {
+            // HttpOnly 쿠키에서 Refresh Token 가져오기
+            String refreshToken = Arrays.stream(request.getCookies())
+                    .filter(cookie -> "refreshToken".equals(cookie.getName()))
+                    .findFirst()
+                    .map(Cookie::getValue)
+                    .orElse(null);
+
+            if (refreshToken == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Refresh token is missing");
+            }
+
             if (jwtUtil.isExpired(refreshToken)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Refresh token expired");
             }
@@ -34,9 +51,23 @@ public class AuthController {
             String role = jwtUtil.getRole(refreshToken);
             String newAccessToken = jwtUtil.createAccessToken(username, role);
 
-            return ResponseEntity.ok().header("Authorization", "Bearer " + newAccessToken).body("Access token refreshed");
+            return ResponseEntity.ok()
+                    .header("Authorization", "Bearer " + newAccessToken) // Authorization 헤더로 전달
+                    .body("Access token refreshed");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token: " + e.getMessage());
         }
     }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser(@RequestHeader("Authorization") String token) {
+        try {
+            System.out.println(token);
+            String username = getUsername(token);
+            return ResponseEntity.ok(Map.of("username", username));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
+        }
+    }
+
 }

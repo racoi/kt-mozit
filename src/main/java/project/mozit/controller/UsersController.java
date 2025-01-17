@@ -30,10 +30,21 @@ public class UsersController {
         return ResponseEntity.status(HttpStatus.CREATED).body("회원가입이 완료되었습니다.");
     }
 
-    @GetMapping("/logout-success")
-    public ResponseEntity<String> logoutSuccess() {
-        return ResponseEntity.ok("로그아웃 성공");
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestHeader("Authorization") String accessToken) {
+        String username = jwtUtil.getUsername(accessToken.substring(7));
+        if (accessToken == null || username == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid logout request");
+        }
+
+        try {
+            usersService.logout(username);
+            return ResponseEntity.ok("Logout successful");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Logout failed: " + e.getMessage());
+        }
     }
+
 
     @GetMapping("/check-id")
     public ResponseEntity<String> checkUserId(@RequestParam("userId") String userId) {

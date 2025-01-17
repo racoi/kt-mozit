@@ -10,6 +10,7 @@ import project.mozit.dto.UsersDTO;
 import project.mozit.mapper.UsersMapper;
 import project.mozit.repository.EnterprisesRepository;
 import project.mozit.repository.UsersRepository;
+import project.mozit.util.RedisUtil;
 
 import java.util.Optional;
 
@@ -21,6 +22,7 @@ public class UsersService {
     private final EnterprisesRepository enterprisesRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final UsersMapper usersMapper;
+    private final RedisUtil redisUtil;
 
     public void joinProcess(UsersDTO.Post usersDto){
 
@@ -58,6 +60,13 @@ public class UsersService {
 
     public Optional<String> findUserId(String userEmail){
         return Optional.ofNullable(userRepository.findUserIdByUserEmail(userEmail));
+    }
+
+    public void logout(String username) {
+        if (username != null) {
+            redisUtil.deleteData(username);
+            System.out.println("Redis에서 Refresh Token 삭제 완료");
+        }
     }
 
     @Transactional
