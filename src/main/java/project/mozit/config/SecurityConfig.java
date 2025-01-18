@@ -61,13 +61,6 @@ public class SecurityConfig {
 
                 .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, redisUtil), UsernamePasswordAuthenticationFilter.class)
 
-//                .logout((auth) -> auth
-//                        .logoutUrl("/users/logout")
-//                        .logoutSuccessUrl("/users/logout-success")
-//                        .invalidateHttpSession(true) // 세션 무효화
-//                        .deleteCookies("refreshToken")
-//                )
-
                 .headers(headers -> headers
                         .addHeaderWriter(new XFrameOptionsHeaderWriter(
                                 XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN))

@@ -1,13 +1,11 @@
-package project.mozit.controller;
+package project.mozit.service;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import project.mozit.dto.CustomUserDetails;
+import org.springframework.stereotype.Service;
 import project.mozit.repository.UsersRepository;
 import project.mozit.util.JWTUtil;
 import project.mozit.util.RedisUtil;
@@ -15,19 +13,13 @@ import project.mozit.util.RedisUtil;
 import java.util.Arrays;
 import java.util.Map;
 
-@RestController
-@RequestMapping("auth")
+@Service
 @RequiredArgsConstructor
-public class AuthController {
+public class AuthService {
     private final JWTUtil jwtUtil;
     private final RedisUtil redisUtil;
-    public final UsersRepository usersRepository;
+    private final UsersRepository usersRepository;
 
-    public String getUsername(String token){
-        return jwtUtil.getUsername(token.replace("Bearer ", ""));
-    }
-
-    @PostMapping("/refresh")
     public ResponseEntity<?> refreshAccessToken(HttpServletRequest request) {
         try {
             // HttpOnly 쿠키에서 Refresh Token 가져오기
@@ -38,42 +30,32 @@ public class AuthController {
                     .orElse(null);
 
             if (refreshToken == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Refresh token is missing");
+                return ResponseEntity.status(401).body("Refresh token is missing");
             }
 
             if (jwtUtil.isExpired(refreshToken)) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Refresh token expired");
+                return ResponseEntity.status(401).body("Refresh token expired");
             }
 
             String username = jwtUtil.getUsername(refreshToken);
             String storedToken = redisUtil.getData(username);
 
             if (storedToken == null || !storedToken.equals(refreshToken)) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired refresh token");
+                return ResponseEntity.status(401).body("Invalid or expired refresh token");
             }
+
+            // 사용자 정보 검색
+            var user = usersRepository.findByUserId(username);
 
             String role = jwtUtil.getRole(refreshToken);
             String newAccessToken = jwtUtil.createAccessToken(username, role);
 
-            var user = usersRepository.findByUserId(username);
-
+            // 전체 이름 포함하여 반환
             return ResponseEntity.ok()
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + newAccessToken)
-                    .body(Map.of("username", user.getUserName()));
+                    .body(Map.of("username", user.getUserName())); // 사용자 전체 이름 반환
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token: " + e.getMessage());
+            return ResponseEntity.status(401).body("Invalid token: " + e.getMessage());
         }
     }
-
-    @GetMapping("/me")
-    public ResponseEntity<?> getCurrentUser(@RequestHeader("Authorization") String token) {
-        try {
-            String username = getUsername(token);
-            var user = usersRepository.findByUserId(username);
-            return ResponseEntity.ok(Map.of("username", user));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
-        }
-    }
-
 }

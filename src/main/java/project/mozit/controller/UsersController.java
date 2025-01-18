@@ -1,8 +1,10 @@
 package project.mozit.controller;
 
 import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.mozit.dto.EmailDTO;
@@ -31,14 +33,22 @@ public class UsersController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(@RequestHeader("Authorization") String accessToken) {
+    public ResponseEntity<String> logout(@RequestHeader("Authorization") String accessToken, HttpServletResponse response) {
         String username = jwtUtil.getUsername(accessToken.substring(7));
-        if (accessToken == null || username == null) {
+
+        if (accessToken == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid logout request");
         }
 
         try {
             usersService.logout(username);
+            ResponseCookie cookie = ResponseCookie.from("refreshToken", "")
+                    .httpOnly(true)
+                    .secure(false) // 개발 환경에서는 false, 배포 시 true
+                    .path("/")
+                    .maxAge(0) // 만료 시간 0으로 설정
+                    .build();
+            response.setHeader("Set-Cookie", cookie.toString());
             return ResponseEntity.ok("Logout successful");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Logout failed: " + e.getMessage());
