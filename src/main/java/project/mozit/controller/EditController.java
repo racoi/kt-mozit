@@ -46,12 +46,14 @@ public class EditController {
     // 편집 시작-DB에 저장
     @PostMapping("/start-editing")
     public ResponseEntity<Long> startEditing(@RequestParam("videoFileName") String videoFileName, @RequestHeader("Authorization") String token) {
-
         try {
-//            editService.sendVideoPathToFastAPI(videoFileName);
-            String thumbnail = "/path/to/thumbnail.jpg";
+            String thumbnail = editService.extractThumbnail(videoFileName);
             Long editNum = editService.saveStartEditing(thumbnail, token);
-            return ResponseEntity.ok(editNum);// EDIT_NUM 반환
+            return ResponseEntity.ok(editNum); // EDIT_NUM 반환
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);

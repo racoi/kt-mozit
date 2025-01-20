@@ -20,6 +20,7 @@ import project.mozit.repository.DownloadsRepository;
 import project.mozit.repository.EditsRepository;
 import project.mozit.repository.UsersRepository;
 import project.mozit.util.JWTUtil;
+import project.mozit.util.ThumbnailUtil;
 //import project.mozit.client.dto.VideoPathRequest;
 //import project.mozit.client.api.FastApiClient;
 
@@ -98,6 +99,22 @@ public class EditService {
         }
     }
 */
+
+    // 썸네일 추출 메서드
+    public String extractThumbnail(String videoFileName) throws IOException {
+        String videoPath = Paths.get(UPLOAD_DIR, videoFileName).toString();
+
+        // 체크: 파일이 존재하는지 확인
+        File videoFile = new File(videoPath);
+        if (!videoFile.exists()) {
+            throw new IOException("비디오 파일이 존재하지 않습니다: " + videoPath);
+        }
+
+        String thumbnailPath = Paths.get(UPLOAD_DIR, "thumbnail-" + videoFileName + ".jpg").toString();
+        ThumbnailUtil.extractThumbnail(videoPath, thumbnailPath);
+        return thumbnailPath; // 썸네일 경로 반환
+    }
+
 
     // 편집 시작 내용 DB에 저장
     @Transactional
