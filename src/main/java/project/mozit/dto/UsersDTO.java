@@ -3,6 +3,7 @@ package project.mozit.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import project.mozit.domain.Enterprises;
+import project.mozit.domain.Users;
 
 public class UsersDTO {
 
@@ -12,6 +13,7 @@ public class UsersDTO {
         private String userName;
         private String userPwd;
         private String userEmail;
+        private Users.SubType subType;
 
         private Long enterpriseNum;
         private String enterpriseName;
@@ -32,6 +34,7 @@ public class UsersDTO {
         private String userId;
         private String userName;
         private String userEmail;
+        private Users.SubType subType;
 
         private Long enterpriseNum;
         private String enterpriseName;
