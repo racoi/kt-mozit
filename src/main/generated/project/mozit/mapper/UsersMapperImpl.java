@@ -9,7 +9,7 @@ import project.mozit.dto.UsersDTO.Response;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-01-17T16:38:07+0900",
+    date = "2025-01-21T10:42:11+0900",
     comments = "version: 1.4.1.Final, compiler: javac, environment: Java 17.0.13 (Eclipse Adoptium)"
 )
 @Component
@@ -41,8 +41,6 @@ public class UsersMapperImpl implements UsersMapper {
 
         response.setEnterpriseNum( userEnterpriseNumEnterpriseNum( user ) );
         response.setEnterpriseName( userEnterpriseNumEnterpriseName( user ) );
-        response.setEnterpriseAddr( userEnterpriseNumEnterpriseAddr( user ) );
-        response.setEnterpriseCall( userEnterpriseNumEnterpriseCall( user ) );
         response.setUserNum( user.getUserNum() );
         response.setUserId( user.getUserId() );
         response.setUserName( user.getUserName() );
@@ -79,35 +77,5 @@ public class UsersMapperImpl implements UsersMapper {
             return null;
         }
         return enterpriseName;
-    }
-
-    private String userEnterpriseNumEnterpriseAddr(Users users) {
-        if ( users == null ) {
-            return null;
-        }
-        Enterprises enterpriseNum = users.getEnterpriseNum();
-        if ( enterpriseNum == null ) {
-            return null;
-        }
-        String enterpriseAddr = enterpriseNum.getEnterpriseAddr();
-        if ( enterpriseAddr == null ) {
-            return null;
-        }
-        return enterpriseAddr;
-    }
-
-    private String userEnterpriseNumEnterpriseCall(Users users) {
-        if ( users == null ) {
-            return null;
-        }
-        Enterprises enterpriseNum = users.getEnterpriseNum();
-        if ( enterpriseNum == null ) {
-            return null;
-        }
-        String enterpriseCall = enterpriseNum.getEnterpriseCall();
-        if ( enterpriseCall == null ) {
-            return null;
-        }
-        return enterpriseCall;
     }
 }

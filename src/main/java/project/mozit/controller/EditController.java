@@ -1,14 +1,15 @@
 package project.mozit.controller;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import project.mozit.domain.Edits;
 import project.mozit.dto.EditsDTO;
 import project.mozit.service.EditService;
+import project.mozit.service.FastApiService;
 
 import java.io.IOException;
 import java.util.List;
@@ -18,6 +19,9 @@ import java.util.List;
 public class EditController {
 
     private final EditService editService;
+
+    @Autowired
+    private FastApiService fastApiService;
 
     public EditController(EditService editService) {
         this.editService = editService;
@@ -58,6 +62,15 @@ public class EditController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
+    }
+
+    // 동영상 경로를 FastAPI에 전송하는 요청 처리
+    @PostMapping("/send-video-path")
+    public ResponseEntity<String> sendVideoPath(@RequestBody String videoPath) {
+        // FastAPI에 video_path 전달
+        fastApiService.sendVideoPath(videoPath);
+
+        return ResponseEntity.ok("Video path sent successfully");
     }
 
 
@@ -122,3 +135,4 @@ public class EditController {
     }
 
 }
+

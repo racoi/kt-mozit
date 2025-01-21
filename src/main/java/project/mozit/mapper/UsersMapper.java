@@ -17,8 +17,6 @@ public interface UsersMapper {
 
     @Mapping(target = "enterpriseNum", source = "enterpriseNum.enterpriseNum")
     @Mapping(target = "enterpriseName", source = "enterpriseNum.enterpriseName")
-    @Mapping(target = "enterpriseAddr", source = "enterpriseNum.enterpriseAddr")
-    @Mapping(target = "enterpriseCall", source = "enterpriseNum.enterpriseCall")
     UsersDTO.Response entityToResponse(Users user);
 
     default Enterprises mapEnterpriseNum(Long enterpriseNum) {

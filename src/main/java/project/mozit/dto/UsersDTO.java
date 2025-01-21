@@ -17,8 +17,6 @@ public class UsersDTO {
 
         private Long enterpriseNum;
         private String enterpriseName;
-        private String enterpriseAddr;
-        private String enterpriseCall;
     }
 
     @Data
@@ -38,7 +36,5 @@ public class UsersDTO {
 
         private Long enterpriseNum;
         private String enterpriseName;
-        private String enterpriseAddr;
-        private String enterpriseCall;
     }
 }

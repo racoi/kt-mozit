@@ -37,8 +37,6 @@ public class UsersService {
                     Enterprises newEnterprise = new Enterprises();
                     newEnterprise.setEnterpriseNum(usersDto.getEnterpriseNum());
                     newEnterprise.setEnterpriseName(usersDto.getEnterpriseName());
-                    newEnterprise.setEnterpriseAddr(usersDto.getEnterpriseAddr());
-                    newEnterprise.setEnterpriseCall(usersDto.getEnterpriseCall());
                     return enterprisesRepository.save(newEnterprise);
                 });
 
