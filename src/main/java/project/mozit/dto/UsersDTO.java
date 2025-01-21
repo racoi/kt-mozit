@@ -15,11 +15,6 @@ public class UsersDTO {
 
         private Long enterpriseNum;
         private String enterpriseName;
-<<<<<<< HEAD
-=======
-        private String enterpriseAddr;
-        private String enterpriseCall;
->>>>>>> d39e813934a412cd21484fe569c5905d24bf8fe5
     }
 
     @Data
@@ -38,10 +33,5 @@ public class UsersDTO {
 
         private Long enterpriseNum;
         private String enterpriseName;
-<<<<<<< HEAD
-=======
-        private String enterpriseAddr;
-        private String enterpriseCall;
->>>>>>> d39e813934a412cd21484fe569c5905d24bf8fe5
     }
 }

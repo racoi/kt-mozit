@@ -121,8 +121,5 @@ public class EditController {
         }
     }
 
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> d39e813934a412cd21484fe569c5905d24bf8fe5
+
