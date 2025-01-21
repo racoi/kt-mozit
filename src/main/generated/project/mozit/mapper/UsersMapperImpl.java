@@ -9,7 +9,11 @@ import project.mozit.dto.UsersDTO.Response;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
+<<<<<<< HEAD
+    date = "2025-01-21T10:28:20+0900",
+=======
     date = "2025-01-17T16:38:07+0900",
+>>>>>>> d39e813934a412cd21484fe569c5905d24bf8fe5
     comments = "version: 1.4.1.Final, compiler: javac, environment: Java 17.0.13 (Eclipse Adoptium)"
 )
 @Component
@@ -41,8 +45,11 @@ public class UsersMapperImpl implements UsersMapper {
 
         response.setEnterpriseNum( userEnterpriseNumEnterpriseNum( user ) );
         response.setEnterpriseName( userEnterpriseNumEnterpriseName( user ) );
+<<<<<<< HEAD
+=======
         response.setEnterpriseAddr( userEnterpriseNumEnterpriseAddr( user ) );
         response.setEnterpriseCall( userEnterpriseNumEnterpriseCall( user ) );
+>>>>>>> d39e813934a412cd21484fe569c5905d24bf8fe5
         response.setUserNum( user.getUserNum() );
         response.setUserId( user.getUserId() );
         response.setUserName( user.getUserName() );
@@ -80,6 +87,8 @@ public class UsersMapperImpl implements UsersMapper {
         }
         return enterpriseName;
     }
+<<<<<<< HEAD
+=======
 
     private String userEnterpriseNumEnterpriseAddr(Users users) {
         if ( users == null ) {
@@ -110,4 +119,5 @@ public class UsersMapperImpl implements UsersMapper {
         }
         return enterpriseCall;
     }
+>>>>>>> d39e813934a412cd21484fe569c5905d24bf8fe5
 }

@@ -14,10 +14,4 @@ public class Enterprises {
 
     @Column(name = "enterprise_name", nullable = false)
     private String enterpriseName;
-
-    @Column(name = "enterprise_addr", nullable = false)
-    private String enterpriseAddr;
-
-    @Column(name = "enterprise_call", nullable = false)
-    private String enterpriseCall;
 }
