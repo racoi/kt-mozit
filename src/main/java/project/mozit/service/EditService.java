@@ -10,6 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import project.mozit.client.api.FastApiClient;
+import project.mozit.client.dto.VideoPathRequest;
+import project.mozit.client.dto.VideoResponse;
 import project.mozit.domain.Downloads;
 import project.mozit.domain.Edits;
 import project.mozit.domain.Users;
@@ -21,8 +25,7 @@ import project.mozit.repository.EditsRepository;
 import project.mozit.repository.UsersRepository;
 import project.mozit.util.JWTUtil;
 import project.mozit.util.ThumbnailUtil;
-//import project.mozit.client.dto.VideoPathRequest;
-//import project.mozit.client.api.FastApiClient;
+import project.mozit.client.dto.VideoPathRequest;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,11 +53,14 @@ public class EditService {
     @Autowired
     private DownloadsMapper downloadsMapper;
 
-//    @Autowired
-//    private FastApiClient fastApiClient;
+    @Autowired
+    private FastApiClient fastApiClient;
 
     @Autowired
     private JWTUtil jwtUtil;
+
+    @Autowired
+    private FastApiService fastApiService;
 
     public String getUsername(String token){
         return jwtUtil.getUsername(token.replace("Bearer ", ""));
@@ -86,19 +92,12 @@ public class EditService {
         return safeFileName; // 저장된 파일 이름 반환
     }
 
-/*
-    // FastAPI에 동영상 경로 전송
-    public void sendVideoPathToFastAPI(String videoFileName) {
-        Path videoPath = Paths.get(UPLOAD_DIR, videoFileName);
-        VideoPathRequest videoPathRequest = new VideoPathRequest(videoPath.toString());
 
-        try {
-            fastApiClient.uploadVideo(videoPathRequest);
-        } catch (Exception e) {
-            System.err.println("FastAPI에 동영상 경로 전송 실패: " + e.getMessage());
-        }
-    }
-*/
+
+//// 동영상 경로를 FastAPI에 보내고 응답을 받는 로직
+//    public VideoResponse sendVideoData(String videoPath) {
+//        return fastApiService.sendVideoData(videoPath);
+//    }
 
     // 썸네일 추출 메서드
     public String extractThumbnail(String videoFileName) throws IOException {
