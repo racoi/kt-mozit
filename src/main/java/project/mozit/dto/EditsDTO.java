@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 
 public class EditsDTO {
     private Long editNum;
+    private String editTitle;
     private String thumbnail;
     private LocalDateTime timestamp;
     private Long userNum;

@@ -8,11 +8,14 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.mozit.dto.EmailDTO;
+import project.mozit.dto.NoticesDTO;
+import project.mozit.dto.UserWorkDownloadDTO;
 import project.mozit.dto.UsersDTO;
 import project.mozit.service.EmailService;
 import project.mozit.service.UsersService;
 import project.mozit.util.JWTUtil;
 
+import java.util.List;
 import java.util.Map;
 
 
@@ -132,4 +135,13 @@ public class UsersController {
         }
     }
 
+    @GetMapping
+    public List<UsersDTO.Response> getUsers(){
+        return usersService.findUsers();
+    }
+
+    @GetMapping("/summary")
+    public List<UserWorkDownloadDTO.Response> getUsersSummary(){
+        return usersService.findUserWorkDownload();
+    }
 }

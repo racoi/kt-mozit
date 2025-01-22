@@ -1,21 +1,31 @@
 package project.mozit.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.mozit.domain.Enterprises;
+import project.mozit.domain.Notices;
 import project.mozit.domain.Users;
+import project.mozit.dto.NoticesDTO;
+import project.mozit.dto.UserWorkDownloadDTO;
 import project.mozit.dto.UsersDTO;
 import project.mozit.mapper.UsersMapper;
 import project.mozit.repository.EnterprisesRepository;
 import project.mozit.repository.UsersRepository;
 import project.mozit.util.RedisUtil;
 
+import java.math.BigInteger;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UsersService {
 
     private final UsersRepository userRepository;
@@ -76,4 +86,35 @@ public class UsersService {
         userRepository.save(user);
     }
 
+    public List<UsersDTO.Response> findUsers(){
+        List<Users> users = userRepository.findAll();
+        return usersMapper.usersToResponse(users);
+    }
+
+    public List<UserWorkDownloadDTO.Response> findUserWorkDownload() {
+        Logger logger = LoggerFactory.getLogger(getClass());
+
+        try {
+            List<Object[]> results = userRepository.findUserWorkDownloadNative();
+            return results.stream()
+                    .map(r -> {
+                        UserWorkDownloadDTO.Response response = new UserWorkDownloadDTO.Response();
+                        // UserNum 처리: Long으로 처리
+                        response.setUserNum(r[0] != null ? ((Long) r[0]) : 0L);
+                        // Username 처리
+                        response.setUsername((String) r[1]);
+                        // EnterpriseName 처리
+                        response.setEnterpriseName((String) r[2]);
+                        // WorkCount 처리: Long으로 처리
+                        response.setWorkCount(r[3] != null ? ((Long) r[3]) : 0L);
+                        // DownloadCount 처리: Long으로 처리
+                        response.setDownloadCount(r[4] != null ? ((Long) r[4]) : 0L);
+                        return response;
+                    })
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            logger.error("Error while fetching user work download data", e);  // 로그 남기기
+            throw new RuntimeException("Error while fetching user work download data", e); // 예외 던지기
+        }
+    }
 }

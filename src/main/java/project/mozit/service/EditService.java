@@ -195,6 +195,7 @@ public class EditService {
 
             response.add(new EditsDTO(
                     edit.getEditNum(),
+                    edit.getEditTitle(),
                     edit.getThumbnail(),
                     edit.getTimestamp(),
                     userNum.getUserNum(), // userNum 추가

@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.List;
+
 @Entity
 @Data
 public class Users {
@@ -29,6 +31,10 @@ public class Users {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "enterprise_num")
     private Enterprises enterpriseNum;
+
+    @OneToMany(mappedBy = "userNum", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Edits> edits;
+
 
     @Enumerated(EnumType.STRING)
     @Column(name = "user_sub")
