@@ -4,10 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
-import project.mozit.domain.Faqs;
-import project.mozit.dto.FaqsDTO.Patch;
-import project.mozit.dto.FaqsDTO.Post;
-import project.mozit.dto.FaqsDTO.Response;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",

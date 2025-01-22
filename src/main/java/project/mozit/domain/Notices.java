@@ -20,7 +20,7 @@ public class Notices {
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(name = "updated_at")
+    @Column(name = "updated_at", insertable = false)
     private LocalDateTime updatedAt;
 
     @Column(name = "notice_title", nullable = false)
