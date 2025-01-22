@@ -54,6 +54,8 @@ public class MyService {
             user.setUserPwd(passwordEncoder.encode(updateDto.getUserPwd()));
         }
 
+        user.setUserSub(updateDto.getUserSub());
+
         userRepository.save(user);
     }
 }

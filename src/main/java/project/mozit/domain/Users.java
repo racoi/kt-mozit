@@ -38,7 +38,7 @@ public class Users {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "user_sub")
-    private SubType userSub = SubType.Basic;
+    private SubType userSub;
 
     public enum SubType{
         Basic,

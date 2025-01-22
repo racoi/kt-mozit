@@ -125,6 +125,7 @@ public class EditService {
         }
         Edits edits = new Edits();
 
+        edits.setEditTitle(edits.getEditTitle()); // *
         edits.setThumbnail(thumbnail); //1. 썸네일 경로
         edits.setTimestamp(LocalDateTime.now()); // 2. 현재 시간 설정
         edits.setUserNum(userNum); // Users 객체를 설정

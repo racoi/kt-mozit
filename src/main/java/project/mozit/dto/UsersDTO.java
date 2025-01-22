@@ -13,7 +13,7 @@ public class UsersDTO {
         private String userName;
         private String userPwd;
         private String userEmail;
-        private Users.SubType subType;
+        private Users.SubType userSub;
 
         private Long enterpriseNum;
         private String enterpriseName;
@@ -24,6 +24,7 @@ public class UsersDTO {
         private String userName;
         private String userEmail;
         private String userPwd;
+        private Users.SubType userSub;
     }
 
     @Data
@@ -32,7 +33,7 @@ public class UsersDTO {
         private String userId;
         private String userName;
         private String userEmail;
-        private Users.SubType subType;
+        private Users.SubType userSub;
 
         private Long enterpriseNum;
         private String enterpriseName;
