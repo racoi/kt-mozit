@@ -1,14 +1,37 @@
 package project.mozit.client.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class VideoPathRequest {
-    private String video_path;  // video_path 필드를 직접 받도록 설정
+
+    @JsonProperty("video_path") // JSON 필드 이름 명시
+    private String videoPath;
+
+    @JsonProperty("output_path")
+    private String outputPath;
 
     // Getter and Setter
-    public String getVideo_path() {
-        return video_path;
+    public String getVideoPath() {
+        return videoPath;
     }
 
-    public void setVideo_path(String video_path) {
-        this.video_path = video_path;
+    public void setVideoPath(String videoPath) {
+        this.videoPath = videoPath;
+    }
+
+    public String getOutputPath() {
+        return outputPath;
+    }
+
+    public void setOutputPath(String outputPath) {
+        this.outputPath = outputPath;
+    }
+
+    @Override
+    public String toString() {
+        return "VideoPathRequest{" +
+                "videoPath='" + videoPath + '\'' +
+                ", outputPath='" + outputPath + '\'' +
+                '}';
     }
 }
