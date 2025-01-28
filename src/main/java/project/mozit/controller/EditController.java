@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import project.mozit.client.dto.VideoPathRequest;
 import project.mozit.dto.EditsDTO;
 import project.mozit.dto.MosaicStatusRequest;
 import project.mozit.service.EditService;
@@ -89,12 +90,20 @@ public class EditController {
 
     // 동영상 경로를 FastAPI에 전송하는 요청 처리
     @PostMapping("/send-video-path")
-    public ResponseEntity<String> sendVideoPath(@RequestBody String savedFileName) {
-        // FastAPI에 video_path 전달
-        fastApiService.sendVideoPath(savedFileName);
-
-        return ResponseEntity.ok("Video path sent successfully");
+    public ResponseEntity<String> sendVideoPath(@RequestBody VideoPathRequest videoPathRequest) {
+        System.out.println("Received videoPath: " + videoPathRequest.getVideoPath());
+        System.out.println("Received outputPath: " + videoPathRequest.getOutputPath());
+        try {
+            fastApiService.sendVideoPath(videoPathRequest.getVideoPath(), videoPathRequest.getOutputPath());
+            return ResponseEntity.ok("Video path sent successfully: " + videoPathRequest.getVideoPath());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to send video path: " + e.getMessage());
+        }
     }
+
+
+
 
 
 

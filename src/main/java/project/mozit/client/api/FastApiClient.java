@@ -12,6 +12,6 @@ import java.util.Map;
 @FeignClient(name = "fastApiClient", url = "${mozit.api.host}")
 public interface FastApiClient {
 
-    @PostMapping("/upload_video")
-    ResponseEntity<Map<String, Object>> uploadVideo(@RequestBody VideoPathRequest videoPathRequest);
+    @PostMapping("/process-video/")
+    ResponseEntity<VideoResponse> uploadVideo(@RequestBody VideoPathRequest videoPathRequest);
 }
