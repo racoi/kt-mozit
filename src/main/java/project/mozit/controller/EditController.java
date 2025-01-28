@@ -2,7 +2,9 @@ package project.mozit.controller;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +16,8 @@ import project.mozit.service.EditService;
 import project.mozit.service.FastApiService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +30,8 @@ public class EditController {
     private final EditService editService;
     // 모자이크 상태를 클래스명별로 저장
     private Map<String, Boolean> mosaicStatus = new HashMap<>();
+
+    private static final String UPLOAD_DIR = "C:/Users/User/mini7/kt-mozit/temp"; // 비디오 파일이 저장된 경로
 
     private static final Logger log = LoggerFactory.getLogger(EditController.class);
     @Autowired
@@ -102,7 +108,21 @@ public class EditController {
         }
     }
 
+    @GetMapping("/videos/{fileName}")
+    public ResponseEntity<FileSystemResource> getVideo(@PathVariable("fileName") String fileName) {
+        System.out.println("왜 안나오지" + fileName);
+        File file = new File(UPLOAD_DIR, fileName);  // /temp 디렉토리 경로
+        System.out.println("파일 경로: " + file.getAbsolutePath());  // 파일 경로 출력
 
+        if (file.exists()) {
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + file.getName() + "\"");
+            headers.add(HttpHeaders.CONTENT_TYPE, "video/mp4"); // 또는 해당 비디오 형식
+            return new ResponseEntity<>(new FileSystemResource(file), headers, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 
 
 
