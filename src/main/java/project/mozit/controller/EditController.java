@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import project.mozit.client.dto.VideoPathRequest;
+import project.mozit.client.dto.VideoResponse;
 import project.mozit.dto.EditsDTO;
 import project.mozit.dto.MosaicStatusRequest;
 import project.mozit.service.EditService;
@@ -19,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,25 +96,39 @@ public class EditController {
         }
     }
 
-    // 동영상 경로를 FastAPI에 전송하는 요청 처리
     @PostMapping("/send-video-path")
-    public ResponseEntity<String> sendVideoPath(@RequestBody VideoPathRequest videoPathRequest) {
+    public ResponseEntity<?> sendVideoPath(@RequestBody VideoPathRequest videoPathRequest) {
         System.out.println("Received videoPath: " + videoPathRequest.getVideoPath());
         System.out.println("Received outputPath: " + videoPathRequest.getOutputPath());
+
         try {
-            fastApiService.sendVideoPath(videoPathRequest.getVideoPath(), videoPathRequest.getOutputPath());
-            return ResponseEntity.ok("Video path sent successfully: " + videoPathRequest.getVideoPath());
+            // FastAPI에 비디오 경로를 전송하고 응답 받기
+            VideoResponse videoResponse = fastApiService.sendVideoPath(
+                    videoPathRequest.getVideoPath(),
+                    videoPathRequest.getOutputPath()
+            );
+
+            if (videoResponse != null) {
+                return ResponseEntity.ok(videoResponse); // VideoResponse 반환
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("Failed to process video path.");
+            }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Failed to send video path: " + e.getMessage());
         }
     }
 
+
+
+
+
+    //편집 화면에서 동영상 불러오기
     @GetMapping("/videos/{fileName}")
     public ResponseEntity<FileSystemResource> getVideo(@PathVariable("fileName") String fileName) {
-        System.out.println("왜 안나오지" + fileName);
+        System.out.println("Requested video file: " + fileName);
         File file = new File(UPLOAD_DIR, fileName);  // /temp 디렉토리 경로
-        System.out.println("파일 경로: " + file.getAbsolutePath());  // 파일 경로 출력
 
         if (file.exists()) {
             HttpHeaders headers = new HttpHeaders();
@@ -123,6 +139,26 @@ public class EditController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
+
+    @GetMapping("/videos/{fileName}/info")
+    public ResponseEntity<?> getVideoInfo(@PathVariable("fileName") String fileName) {
+        List<VideoResponse.FrameInfo> frameInfos = fastApiService.getVideoResponse(fileName);
+
+        if (frameInfos == null || frameInfos.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No video response found.");
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("videoUrl", "http://localhost:8080/videos/" + fileName);
+        response.put("detections", frameInfos); // 모든 감지 데이터를 추가
+
+        return ResponseEntity.ok(response);
+    }
+
+
+
+
 
 
 
