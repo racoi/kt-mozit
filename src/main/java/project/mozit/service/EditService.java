@@ -1,6 +1,5 @@
 package project.mozit.service;
 
-//import org.springframework.beans.factory.annotation.Autowired;
 import jakarta.persistence.EntityNotFoundException;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
@@ -8,8 +7,6 @@ import org.opencv.core.Rect;
 import org.opencv.core.Size;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
-import org.opencv.videoio.VideoCapture;
-import org.opencv.videoio.Videoio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -146,7 +143,7 @@ public class EditService {
         return savedEdits.getEditNum(); // 저장된 EDIT_NUM 반환
     }
 
-
+/*
     // 모자이크 상태 업데이트
     public void updateMosaicStatus(MosaicStatusRequest request) {
         // 클래스별 모자이크 활성화 상태 저장
@@ -209,7 +206,7 @@ public class EditService {
     }
 
 
-
+*/
 
 
     //다운로드시 모자이크 처리할 내용 DB에 저장.

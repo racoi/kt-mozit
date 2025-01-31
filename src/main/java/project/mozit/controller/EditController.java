@@ -161,7 +161,7 @@ public class EditController {
 
 
 
-
+/*
 
     // 모자이크 상태 업데이트
     @PostMapping("/mosaic-status")
@@ -181,7 +181,7 @@ public class EditController {
 
 
 
-
+*/
 
 
 
