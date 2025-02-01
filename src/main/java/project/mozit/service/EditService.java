@@ -115,7 +115,21 @@ public class EditService {
             throw new IOException("비디오 파일이 존재하지 않습니다: " + videoPath);
         }
 
-        String thumbnailPath = Paths.get(UPLOAD_DIR, "thumbnail-" + videoFileName + ".jpg").toString();
+        // 파일 이름에서 확장자 제거
+        String baseName = videoFileName.substring(0, videoFileName.lastIndexOf('.'));
+        String baseThumbnailName = "thumbnail-" + baseName + ".jpg";
+        String thumbnailPath = Paths.get(UPLOAD_DIR, baseThumbnailName).toString();
+
+        // 중복 체크 및 숫자 추가
+        int count = 1;
+        while (new File(thumbnailPath).exists()) {
+            // 썸네일 이름에 숫자를 추가
+            String newThumbnailName = "thumbnail-" + baseName + "-" + count + ".jpg";
+            thumbnailPath = Paths.get(UPLOAD_DIR, newThumbnailName).toString();
+            count++; // 숫자 증가
+        }
+
+        // 썸네일 추출
         ThumbnailUtil.extractThumbnail(videoPath, thumbnailPath);
         return thumbnailPath; // 썸네일 경로 반환
     }

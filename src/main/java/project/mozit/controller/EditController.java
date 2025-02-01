@@ -141,7 +141,7 @@ public class EditController {
     }
 
 
-    @GetMapping("/videos/{fileName}/info")
+       @GetMapping("/videos/{fileName}/info")
     public ResponseEntity<?> getVideoInfo(@PathVariable("fileName") String fileName) {
         List<VideoResponse.FrameInfo> frameInfos = fastApiService.getVideoResponse(fileName);
 
@@ -188,7 +188,26 @@ public class EditController {
 
 
     // 파일 다운로드 및 DB에 저장
-    @PostMapping("/download")
+//    @PostMapping("/download")
+//    public ResponseEntity<Resource> downloadFile(@RequestParam("fileName") String fileName,
+//                                                 @RequestParam("editNum") Long editNum) {
+//        if (fileName == null || fileName.isBlank()) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+//        }
+//
+//        try {
+//            // DB에 다운로드 정보 저장
+//            editService.saveDownloadInfo(fileName, editNum);
+//            return editService.downloadFile(fileName);  //동영상 다운로드
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+//        }
+//    }
+    @PostMapping("/download")// 임시 다운로드 (동영상 다운로드 서비스 주석처리함.)
     public ResponseEntity<Resource> downloadFile(@RequestParam("fileName") String fileName,
                                                  @RequestParam("editNum") Long editNum) {
         if (fileName == null || fileName.isBlank()) {
@@ -198,24 +217,32 @@ public class EditController {
         try {
             // DB에 다운로드 정보 저장
             editService.saveDownloadInfo(fileName, editNum);
-            return editService.downloadFile(fileName);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+
+            // 파일 다운로드 로직 주석 처리
+            // return editService.downloadFile(fileName);  // 동영상 다운로드
+
+            // 주석 처리 후 대체 응답 (예: 성공 메시지)
+            return ResponseEntity.ok().body(null); // 또는 적절한 응답 객체를 반환하세요
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
+
+
+
     // 다시 편집 요청
     @PostMapping("/restart-editing")
-    public ResponseEntity<Long> startReEditing(@RequestParam("videoFileName") String videoFileName, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<Long> startReEditing(@RequestBody Map<String, String> requestBody, @RequestHeader("Authorization") String token) {
+        String videoFileName = requestBody.get("videoFileName");
 
         try {
-//            editService.sendVideoPathToFastAPI(videoFileName);
-            String thumbnail = "/path/to/thumbnail.jpg";
-            Long editNum = editService.saveStartEditing(thumbnail, token);
+            // 1. 썸네일 생성
+            String thumbnailPath = editService.extractThumbnail(videoFileName);
+            log.info("썸네일 생성 성공: {}", thumbnailPath);
+            // 2. DB에 저장
+            Long editNum = editService.saveStartEditing(thumbnailPath, token);
             return ResponseEntity.ok(editNum);// EDIT_NUM 반환
         } catch (Exception e) {
             e.printStackTrace();
