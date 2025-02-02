@@ -26,6 +26,7 @@ public interface UsersRepository extends JpaRepository<Users, Long> {
             "LEFT JOIN edits e ON u.user_num = e.user_num " +
             "LEFT JOIN downloads d ON e.edit_num = d.edit_num " +
             "LEFT JOIN enterprises c ON u.enterprise_num = c.enterprise_num " +
+            "WHERE u.user_id != 'admin' " +
             "GROUP BY u.user_num, u.user_name, c.enterprise_name", nativeQuery = true)
     List<Object[]> findUserWorkDownloadNative();
 }
