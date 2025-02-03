@@ -146,7 +146,7 @@ public class EditService {
         }
         Edits edits = new Edits();
 
-        edits.setEditTitle(edits.getEditTitle()); // *
+        edits.setEditTitle("제목 없음"); // *
         edits.setThumbnail(thumbnail); //1. 썸네일 경로
         edits.setTimestamp(LocalDateTime.now()); // 2. 현재 시간 설정
         edits.setUserNum(userNum); // Users 객체를 설정
@@ -155,6 +155,15 @@ public class EditService {
         Edits savedEdits = editsRepository.save(edits); // Edits 도메인 객체를 직접 저장
         System.out.println(" 저장 성공: " + thumbnail);
         return savedEdits.getEditNum(); // 저장된 EDIT_NUM 반환
+    }
+
+
+
+    @Transactional
+    public void updateEditTitle(Long editNum, String title) {
+        Edits edits = editsRepository.findById(editNum)
+                .orElseThrow(() -> new EntityNotFoundException("해당 편집을 찾을 수 없습니다. ID: " + editNum));
+        edits.setEditTitle(title); // 제목 업데이트
     }
 
 /*
@@ -225,11 +234,15 @@ public class EditService {
 
     //다운로드시 모자이크 처리할 내용 DB에 저장.
     @Transactional
-    public void saveDownloadInfo(String fileName, Long editNum) {
+    public void saveDownloadInfo(Long editNum, Boolean faceMosaic, String hazardousList, String personalList) {
         Downloads downloads = new Downloads();
-        downloads.setFaceMosaic(false); // 하드코딩된
-        downloads.setHazardousList("칼, 총, 피"); // 하드코딩된
-        downloads.setPersonalList("민증, 여권"); // 하드코딩된
+
+        // 모자이크 적용 여부 설정
+        downloads.setFaceMosaic(faceMosaic); // 얼굴 모자이크 여부
+
+        // 유해 요소 및 개인정보 목록 설정
+        downloads.setHazardousList(hazardousList); // 유해 요소 목록 저장
+        downloads.setPersonalList(personalList); // 개인정보 목록 저장
 
         // EDIT_NUM 설정
         Edits edit = new Edits();
@@ -239,6 +252,9 @@ public class EditService {
         // 다운로드 정보 저장
         downloadsRepository.save(downloads);
     }
+
+
+
 
 
 

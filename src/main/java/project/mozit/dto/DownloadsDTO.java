@@ -9,7 +9,6 @@ import project.mozit.domain.Edits;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DownloadsDTO {
-    private Long downloadNum;
     private Boolean faceMosaic;
     private String hazardousList;
     private String personalList;

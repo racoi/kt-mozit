@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import project.mozit.client.dto.VideoPathRequest;
 import project.mozit.client.dto.VideoResponse;
+import project.mozit.dto.DownloadsDTO;
 import project.mozit.dto.EditsDTO;
-//import project.mozit.dto.MosaicStatusRequest;
+import project.mozit.dto.MosaicStatusRequest;
+import project.mozit.repository.DownloadsRepository;
 import project.mozit.service.EditService;
 import project.mozit.service.FastApiService;
 import org.slf4j.Logger;
@@ -159,6 +161,20 @@ public class EditController {
 
 
 
+    @PutMapping("/{editNum}")
+    public ResponseEntity<Void> updateEditTitle(@PathVariable("editNum") Long editNum, @RequestBody EditsDTO editsDTO) {
+        if (editsDTO.getEditTitle() == null || editsDTO.getEditTitle().isEmpty()) {
+            return ResponseEntity.badRequest().build(); // 제목이 비어있으면 400 Bad Request
+        }
+
+        editService.updateEditTitle(editNum, editsDTO.getEditTitle());
+        return ResponseEntity.ok().build(); // 200 OK
+    }
+
+
+
+
+
 
 
 /*
@@ -207,27 +223,33 @@ public class EditController {
 //            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 //        }
 //    }
-    @PostMapping("/download")// 임시 다운로드 (동영상 다운로드 서비스 주석처리함.)
-    public ResponseEntity<Resource> downloadFile(@RequestParam("fileName") String fileName,
-                                                 @RequestParam("editNum") Long editNum) {
-        if (fileName == null || fileName.isBlank()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+
+    @PostMapping("/download")
+    public ResponseEntity<Void> downloadFile(@RequestBody DownloadsDTO downloadsDTO) {
+        Long editNum = downloadsDTO.getEditNum().getEditNum(); // 편집 번호 가져오기
+        Boolean faceMosaic = downloadsDTO.getFaceMosaic(); // 얼굴 모자이크 여부
+        String hazardousList = downloadsDTO.getHazardousList(); // 유해 요소 목록
+        String personalList = downloadsDTO.getPersonalList(); // 개인정보 목록
+
+        if (editNum == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
         try {
             // DB에 다운로드 정보 저장
-            editService.saveDownloadInfo(fileName, editNum);
+            editService.saveDownloadInfo(editNum, faceMosaic, hazardousList, personalList);
 
-            // 파일 다운로드 로직 주석 처리
-            // return editService.downloadFile(fileName);  // 동영상 다운로드
+            // 파일 다운로드 로직 구현 필요
+            // 예: return editService.downloadFile(fileName); // 동영상 다운로드
 
-            // 주석 처리 후 대체 응답 (예: 성공 메시지)
-            return ResponseEntity.ok().body(null); // 또는 적절한 응답 객체를 반환하세요
+            // 성공 응답
+            return ResponseEntity.ok().build();
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
 
 
 

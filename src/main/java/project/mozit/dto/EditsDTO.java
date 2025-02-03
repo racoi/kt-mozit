@@ -1,7 +1,5 @@
 package project.mozit.dto;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -11,9 +9,13 @@ import java.time.LocalDateTime;
 
 public class EditsDTO {
     private Long editNum;
+    // Getter와 Setter
+    @Setter
+    @Getter
     private String editTitle;
     private String thumbnail;
     private LocalDateTime timestamp;
     private Long userNum;
     private Boolean hasDownload;
+
 }
