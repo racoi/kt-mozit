@@ -65,6 +65,8 @@ public class EditService {
 
     @Autowired
     private FastApiService fastApiService;
+    @Autowired
+    private BlobStorageService blobStorageService;
 
     public String getUsername(String token){
         return jwtUtil.getUsername(token.replace("Bearer ", ""));
@@ -131,7 +133,15 @@ public class EditService {
 
         // 썸네일 추출
         ThumbnailUtil.extractThumbnail(videoPath, thumbnailPath);
-        return thumbnailPath; // 썸네일 경로 반환
+
+        File thumbnailFile = new File(thumbnailPath);
+
+        String blobPath = "thumbnail/" + thumbnailFile.getName();
+        blobStorageService.uploadThumbnail("mozit-container", blobPath, thumbnailFile);
+
+        String thumbnailUrl = blobStorageService.getBlobUrl("mozit-container", blobPath);
+
+        return thumbnailUrl; // 썸네일 경로 반환
     }
 
 

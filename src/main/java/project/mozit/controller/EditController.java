@@ -13,7 +13,7 @@ import project.mozit.client.dto.VideoPathRequest;
 import project.mozit.client.dto.VideoResponse;
 import project.mozit.dto.DownloadsDTO;
 import project.mozit.dto.EditsDTO;
-import project.mozit.dto.MosaicStatusRequest;
+//import project.mozit.dto.MosaicStatusRequest;
 import project.mozit.repository.DownloadsRepository;
 import project.mozit.service.EditService;
 import project.mozit.service.FastApiService;
