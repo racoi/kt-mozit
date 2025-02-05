@@ -2,27 +2,22 @@ package project.mozit.controller;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import project.mozit.client.dto.VideoPathRequest;
 import project.mozit.client.dto.VideoResponse;
 import project.mozit.dto.DownloadsDTO;
 import project.mozit.dto.EditsDTO;
-//import project.mozit.dto.MosaicStatusRequest;
-import project.mozit.repository.DownloadsRepository;
 import project.mozit.service.EditService;
 import project.mozit.service.FastApiService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import org.springframework.web.client.RestTemplate;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +33,14 @@ public class EditController {
     private static final String UPLOAD_DIR = "C:/Users/User/mini7/kt-mozit/temp"; // 비디오 파일이 저장된 경로
 
     private static final Logger log = LoggerFactory.getLogger(EditController.class);
+
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @Value("${mozit.api.host}")
+    private String apiHost;
+
     @Autowired
     private FastApiService fastApiService;
 
@@ -73,12 +76,12 @@ public class EditController {
             String savedFileName = editService.uploadFile(file);
             log.info("파일 저장 성공: {}", savedFileName);
 
-            // 2. 썸네일 생성
-            String thumbnailPath = editService.extractThumbnail(savedFileName);
-            log.info("썸네일 생성 성공: {}", thumbnailPath);
+            // 2. 썸네일 생성 요청
+            String thumbnailUrl = editService.captureThumbnail(savedFileName);
+            log.info("썸네일 생성 성공: {}", thumbnailUrl);
 
             // 3. DB 저장 및 editNum 반환
-            Long editNum = editService.saveStartEditing(thumbnailPath, token);
+            Long editNum = editService.saveStartEditing(thumbnailUrl, token);
             log.info("DB 저장 성공, editNum: {}", editNum);
 
             // 응답 객체 생성
@@ -152,7 +155,7 @@ public class EditController {
         }
 
         Map<String, Object> response = new HashMap<>();
-        response.put("videoUrl", "http://localhost:8080/videos/" + fileName);
+        response.put("videoUrl", apiHost + "/videos/" + fileName);
         response.put("detections", frameInfos); // 모든 감지 데이터를 추가
 
         return ResponseEntity.ok(response);
@@ -171,33 +174,6 @@ public class EditController {
         return ResponseEntity.ok().build(); // 200 OK
     }
 
-
-
-
-
-
-
-/*
-
-    // 모자이크 상태 업데이트
-    @PostMapping("/mosaic-status")
-    public ResponseEntity<String> updateMosaicStatus(@RequestBody MosaicStatusRequest request) {
-        // 클래스별 모자이크 활성화 상태 저장
-        editService.updateMosaicStatus(request);  // Service에서 처리
-        return ResponseEntity.ok("모자이크 상태 업데이트 성공");
-    }
-
-    // 처리된 프레임 반환
-    @GetMapping("/processed-frame")
-    public ResponseEntity<byte[]> getProcessedFrame(@RequestParam("editNum") int editNum) {
-        // editNum에 해당하는 프레임을 처리하여 반환
-        byte[] processedFrame = editService.processFrame(editNum); // Service에서 처리
-        return ResponseEntity.ok(processedFrame);
-    }
-
-
-
-*/
 
 
 
@@ -239,8 +215,8 @@ public class EditController {
             // DB에 다운로드 정보 저장
             editService.saveDownloadInfo(editNum, faceMosaic, hazardousList, personalList);
 
-            // 파일 다운로드 로직 구현 필요
-            // 예: return editService.downloadFile(fileName); // 동영상 다운로드
+            // 파일 다운로드 로직 구현 필요=>프런트에서
+            //return editService.downloadFile(fileName); // 동영상 다운로드
 
             // 성공 응답
             return ResponseEntity.ok().build();
@@ -261,7 +237,7 @@ public class EditController {
 
         try {
             // 1. 썸네일 생성
-            String thumbnailPath = editService.extractThumbnail(videoFileName);
+            String thumbnailPath = editService.captureThumbnail(videoFileName);
             log.info("썸네일 생성 성공: {}", thumbnailPath);
             // 2. DB에 저장
             Long editNum = editService.saveStartEditing(thumbnailPath, token);
