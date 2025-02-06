@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class EditService {
-    private static final String UPLOAD_DIR = "D:/home/site/wwwroot/uploads"; // 파일 업로드 경로
+    private static final String UPLOAD_DIR = "D:\\home\\site\\wwwroot"; // 파일 업로드 경로
     private Map<String, Boolean> mosaicStatus = new HashMap<>();
 
     @Autowired
@@ -90,25 +90,37 @@ public class EditService {
             throw new IOException("유효하지 않은 파일 이름입니다.");
         }
 
+        // 디렉토리 생성
+        File uploadDir = new File(UPLOAD_DIR, "upload"); // uploads 서브 디렉토리
+        if (!uploadDir.exists()) {
+            boolean created = uploadDir.mkdirs(); // 디렉토리 생성 시도
+            if (!created) {
+                throw new IOException("디렉토리 생성에 실패했습니다: " + uploadDir.getAbsolutePath());
+            }
+        }
+
         // 중복 파일명 처리
         String baseName = originalFileName.substring(0, originalFileName.lastIndexOf("."));
         String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
         String safeFileName = originalFileName;
 
         int count = 1;
-        while (new File(UPLOAD_DIR, safeFileName).exists()) {
+        while (new File(uploadDir, safeFileName).exists()) { // 수정된 부분
             safeFileName = baseName + "_" + count + extension;
             count++;
         }
 
+//        // 파일 저장
+//        Path targetLocation = Paths.get(UPLOAD_DIR, safeFileName);
+//        file.transferTo(targetLocation.toFile());
         // 파일 저장
-        Path targetLocation = Paths.get(UPLOAD_DIR, safeFileName);
+        Path targetLocation = Paths.get(uploadDir.getAbsolutePath(), safeFileName); // 수정된 부분
         file.transferTo(targetLocation.toFile());
 
         // ✅ 1시간 후 자동 삭제 예약
         scheduleFileDeletion(targetLocation.toFile(), 60 * 60);
 
-        return UPLOAD_DIR + "/" + safeFileName; //저장된 파일 이름 반환
+        return "파일이 성공적으로 업로드되었습니다: " + targetLocation.toString();  //저장된 파일 이름 반환
     }
 
     private void scheduleFileDeletion(File file, int delaySeconds) {
