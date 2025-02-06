@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class EditService {
-    private static final String UPLOAD_DIR = "D:\\\\home\\\\site\\\\wwwroot\\\\uploads"; // 파일 업로드 경로
+    private static final String UPLOAD_DIR = "D:/home/site/wwwroot/uploads"; // 파일 업로드 경로
     private Map<String, Boolean> mosaicStatus = new HashMap<>();
 
     @Autowired
@@ -108,7 +108,7 @@ public class EditService {
         // ✅ 1시간 후 자동 삭제 예약
         scheduleFileDeletion(targetLocation.toFile(), 60 * 60);
 
-        return UPLOAD_DIR + "\\" + safeFileName; //저장된 파일 이름 반환
+        return UPLOAD_DIR + "/" + safeFileName; //저장된 파일 이름 반환
     }
 
     private void scheduleFileDeletion(File file, int delaySeconds) {
