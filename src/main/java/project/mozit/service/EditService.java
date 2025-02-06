@@ -37,10 +37,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class EditService {
-    private static final String UPLOAD_DIR = "temp"; // 파일 업로드 경로
+    private static final String UPLOAD_DIR = "D:\\home\\uploads"; // 파일 업로드 경로
     private Map<String, Boolean> mosaicStatus = new HashMap<>();
 
     @Autowired
@@ -68,6 +71,8 @@ public class EditService {
 
     @Autowired
     private RestTemplate restTemplate;
+    private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
 
 
     @Value("${mozit.api.host}")
@@ -85,28 +90,37 @@ public class EditService {
             throw new IOException("유효하지 않은 파일 이름입니다.");
         }
 
-        // 디렉토리 생성
-        File directory = new File(UPLOAD_DIR);
-        if (!directory.exists() && !directory.mkdirs()) {
-            throw new IOException("업로드 디렉토리를 생성할 수 없습니다.");
-        }
-
-        // 중복 파일 처리 로직
+        // 중복 파일명 처리
         String baseName = originalFileName.substring(0, originalFileName.lastIndexOf("."));
         String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
         String safeFileName = originalFileName;
 
         int count = 1;
         while (new File(UPLOAD_DIR, safeFileName).exists()) {
-            safeFileName = baseName + "_" + count + extension; // 중복 시 숫자 추가
+            safeFileName = baseName + "_" + count + extension;
             count++;
         }
 
         // 파일 저장
         Path targetLocation = Paths.get(UPLOAD_DIR, safeFileName);
-        file.transferTo(targetLocation);
+        file.transferTo(targetLocation.toFile());
 
-        return safeFileName; // 저장된 파일 이름 반환
+        // ✅ 1시간 후 자동 삭제 예약
+        scheduleFileDeletion(targetLocation.toFile(), 60 * 60);
+
+        return UPLOAD_DIR + "\\" + safeFileName; //저장된 파일 이름 반환
+    }
+
+    private void scheduleFileDeletion(File file, int delaySeconds) {
+        scheduler.schedule(() -> {
+            if (file.exists()) {
+                if (file.delete()) {
+                    System.out.println("🗑️ 파일 삭제 완료: " + file.getAbsolutePath());
+                } else {
+                    System.err.println("⚠️ 파일 삭제 실패: " + file.getAbsolutePath());
+                }
+            }
+        }, delaySeconds, TimeUnit.SECONDS);
     }
 
 
@@ -207,71 +221,6 @@ public class EditService {
                 .orElseThrow(() -> new EntityNotFoundException("해당 편집을 찾을 수 없습니다. ID: " + editNum));
         edits.setEditTitle(title); // 제목 업데이트
     }
-
-/*
-    // 모자이크 상태 업데이트
-    public void updateMosaicStatus(MosaicStatusRequest request) {
-        // 클래스별 모자이크 활성화 상태 저장
-        mosaicStatus.put(request.getClassName(), request.isActive());
-    }
-
-    // 처리된 프레임 반환
-    public byte[] processFrame(int editNum) {
-        // editNum에 해당하는 프레임을 로드 (예시로 가정)
-        Mat frame = loadFrame(editNum); // 프레임 로딩 (loadFrame은 예시 메서드)
-
-        // 저장된 모자이크 상태를 바탕으로 모자이크 처리
-        for (Map.Entry<String, Boolean> entry : mosaicStatus.entrySet()) {
-            String className = entry.getKey();
-            boolean isActive = entry.getValue();
-
-            // 활성화된 클래스만 모자이크 처리
-            if (isActive) {
-                // 해당 클래스에 해당하는 객체들 찾아서 모자이크 처리
-                List<DetectionDTO> detections = getDetectionsForClass(className); // 클래스별 객체 목록
-                applyMosaic(frame, detections); // 모자이크 처리
-            }
-        }
-
-        // 처리된 프레임을 byte[]로 변환하여 반환
-        return convertMatToByteArray(frame);
-    }
-
-    // 프레임을 로드하는 메서드 (예시 구현)
-    private Mat loadFrame(int editNum) {
-        // 실제 구현은 editNum에 맞는 동영상 프레임을 가져와야 합니다
-        return new Mat(); // 임시로 빈 Mat 객체 반환
-    }
-
-    // 클래스별 객체들을 반환하는 메서드 (예시 구현)
-    private List<DetectionDTO> getDetectionsForClass(String className) {
-        // 실제로는 className에 해당하는 객체를 찾아야 함
-        // 여기에 더미 데이터를 넣어도 좋습니다.
-        return new ArrayList<>(); // 예시로 빈 리스트 반환
-    }
-
-    // 모자이크 적용 함수
-    private void applyMosaic(Mat frame, List<DetectionDTO> detections) {
-        for (DetectionDTO detection : detections) {
-            if (detection.isActive()) { // 활성화된 객체에 대해서만 모자이크 처리
-                Rect roi = new Rect((int) detection.getX(), (int) detection.getY(), (int) detection.getWidth(), (int) detection.getHeight());
-                Mat submat = frame.submat(roi);
-                Imgproc.resize(submat, submat, new Size(10, 10)); // 축소
-                Imgproc.resize(submat, submat, roi.size()); // 다시 원래 크기로
-                submat.copyTo(frame.submat(roi));
-            }
-        }
-    }
-
-    // Mat을 byte[]로 변환하는 함수
-    private byte[] convertMatToByteArray(Mat frame) {
-        MatOfByte matOfByte = new MatOfByte();
-        Imgcodecs.imencode(".jpg", frame, matOfByte);
-        return matOfByte.toArray();
-    }
-
-
-*/
 
 
     //다운로드시 모자이크 처리할 내용 DB에 저장.

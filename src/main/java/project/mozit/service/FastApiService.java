@@ -23,7 +23,7 @@ public class FastApiService {
     private ConcurrentHashMap<String, VideoResponse> responseCache = new ConcurrentHashMap<>();
 
     public VideoResponse sendVideoPath(String videoPath, String outputPath) {
-        String fastApiUrl = "http://localhost:8000/process-video/";
+        String fastApiUrl = "http://mozit-fastapi-leo8071004-due6hwdzguebceh7.koreacentral-01.azurewebsites.net/process-video/";
 
         VideoPathRequest videoPathRequest = new VideoPathRequest();
         videoPathRequest.setVideoPath(videoPath);

@@ -47,7 +47,7 @@ public class UsersController {
             usersService.logout(username);
             ResponseCookie cookie = ResponseCookie.from("refreshToken", "")
                     .httpOnly(true)
-                    .secure(false) // 개발 환경에서는 false, 배포 시 true
+                    .secure(true) // 개발 환경에서는 false, 배포 시 true
                     .path("/")
                     .maxAge(0) // 만료 시간 0으로 설정
                     .build();

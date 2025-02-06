@@ -68,7 +68,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         // Refresh Token을 HttpOnly 쿠키로 설정
         ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)
-                .secure(false) // 로컬 개발 시 false, 배포 시 true
+                .secure(true) // 로컬 개발 시 false, 배포 시 true
                 .path("/")
                 .maxAge(jwtUtil.getRefreshTokenExpiration() / 1000)
                 .build();

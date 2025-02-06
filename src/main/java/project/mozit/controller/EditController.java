@@ -30,7 +30,7 @@ public class EditController {
     // 모자이크 상태를 클래스명별로 저장
     private Map<String, Boolean> mosaicStatus = new HashMap<>();
 
-    private static final String UPLOAD_DIR = "C:/Users/User/mini7/kt-mozit/temp"; // 비디오 파일이 저장된 경로
+//    private static final String UPLOAD_DIR = "D:\\home\\uploads"; // 비디오 파일이 저장된 경로
 
     private static final Logger log = LoggerFactory.getLogger(EditController.class);
 
@@ -133,7 +133,7 @@ public class EditController {
     @GetMapping("/videos/{fileName}")
     public ResponseEntity<FileSystemResource> getVideo(@PathVariable("fileName") String fileName) {
         System.out.println("Requested video file: " + fileName);
-        File file = new File(UPLOAD_DIR, fileName);  // /temp 디렉토리 경로
+        File file = new File(fileName);  // /temp 디렉토리 경로
 
         if (file.exists()) {
             HttpHeaders headers = new HttpHeaders();
@@ -163,7 +163,7 @@ public class EditController {
 
 
 
-
+// 편집 완료시 제목 넣기
     @PutMapping("/{editNum}")
     public ResponseEntity<Void> updateEditTitle(@PathVariable("editNum") Long editNum, @RequestBody EditsDTO editsDTO) {
         if (editsDTO.getEditTitle() == null || editsDTO.getEditTitle().isEmpty()) {
