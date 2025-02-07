@@ -2,11 +2,9 @@ package project.mozit.controller;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.mozit.dto.CustomUserDetails;
@@ -30,7 +28,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refreshAccessToken(HttpServletRequest request, HttpServletResponse httpServletResponse) {
+    public ResponseEntity<?> refreshAccessToken(HttpServletRequest request) {
         try {
             // HttpOnly 쿠키에서 Refresh Token 가져오기
             String refreshToken = Arrays.stream(request.getCookies())
@@ -56,20 +54,6 @@ public class AuthController {
 
             String role = jwtUtil.getRole(refreshToken);
             String newAccessToken = jwtUtil.createAccessToken(username, role);
-            String newRefreshToken = jwtUtil.createRefreshToken(username);
-
-            redisUtil.setDataExpire(username, newRefreshToken, jwtUtil.getRefreshTokenExpiration());
-
-
-            ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", newRefreshToken)
-                    .httpOnly(true)
-                    .secure(true)
-                    .sameSite("None")
-                    .path("/")
-                    .maxAge(7 * 24 * 60 * 60)
-                    .build();
-
-            httpServletResponse.addHeader("Set-Cookie", refreshTokenCookie.toString());
 
             var user = usersRepository.findByUserId(username);
 

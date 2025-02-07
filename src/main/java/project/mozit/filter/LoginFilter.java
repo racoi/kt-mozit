@@ -70,7 +70,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
                 .httpOnly(true)
                 .secure(true) // 로컬 개발 시 false, 배포 시 true
                 .sameSite("None")
-                .domain("ambitious-grass-00e12ba00.4.azurestaticapps.net")
+                .domain(null)
                 .path("/")
                 .maxAge(jwtUtil.getRefreshTokenExpiration() / 1000)
                 .build();
