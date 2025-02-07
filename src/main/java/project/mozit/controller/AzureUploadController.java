@@ -1,9 +1,11 @@
 package project.mozit.controller;
 
+import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.azure.storage.blob.specialized.BlockBlobClient;
+import com.azure.storage.common.StorageSharedKeyCredential;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -36,38 +38,33 @@ public class AzureUploadController {
     @Value("${spring.cloud.azure.storage.blob.sas-token}")
     private String sasToken;
 
-    private final RestTemplate restTemplate = new RestTemplate();
-
+    // 파일 업로드
     @PostMapping
     public ResponseEntity<String> uploadFileToAzure(@RequestParam("file") MultipartFile file) {
         try {
-            // 파일을 Blob Storage에 업로드하기 위한 URL 생성
-            String blobUrl = generateBlobUrl(file.getOriginalFilename());
+            // BlobServiceClient를 사용하여 Azure Storage에 연결
+            BlobServiceClient blobServiceClient = new BlobServiceClientBuilder()
+                    .endpoint("https://" + storageAccountName + ".blob.core.windows.net")
+                    .credential(new StorageSharedKeyCredential(storageAccountName, sasToken))
+                    .buildClient();
 
-            // Azure Blob Storage에 파일 업로드
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(org.springframework.http.MediaType.APPLICATION_OCTET_STREAM);
-            headers.set("x-ms-blob-type", "BlockBlob");
+            // BlobContainerClient를 통해 컨테이너를 선택
+            BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(containerName);
 
-            // PUT 메서드로 파일 업로드
-            ResponseEntity<String> response = restTemplate.exchange(
-                    blobUrl,
-                    HttpMethod.PUT,
-                    new org.springframework.http.HttpEntity<>(file.getBytes(), headers),
-                    String.class);
+            // 파일 이름을 URL 인코딩
+            String encodedFileName = URLEncoder.encode(file.getOriginalFilename(), StandardCharsets.UTF_8.toString());
 
-            return ResponseEntity.ok("File uploaded successfully");
+            // BlobClient를 통해 특정 Blob을 선택
+            BlobClient blobClient = containerClient.getBlobClient("question-images/" + encodedFileName);
+
+            // 파일 업로드
+            try (InputStream fileStream = file.getInputStream()) {
+                blobClient.upload(fileStream, file.getSize(), true);  // `true`는 파일이 이미 존재하면 덮어쓰도록 설정
+                return ResponseEntity.ok("File uploaded successfully: " + blobClient.getBlobUrl());
+            }
 
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error uploading file to Azure: " + e.getMessage());
         }
-    }
-
-    private String generateBlobUrl(String fileName) throws UnsupportedEncodingException {
-        String encodedSasToken = URLEncoder.encode(sasToken, "UTF-8");
-
-        // Azure Blob Storage URL 생성
-        return String.format("https://%s.blob.core.windows.net/%s/%s?%s",
-                storageAccountName, containerName, "question-images/" + fileName, encodedSasToken);
     }
 }
