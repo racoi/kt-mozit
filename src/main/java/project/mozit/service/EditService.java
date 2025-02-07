@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class EditService {
-    private static final String UPLOAD_DIR = "D:\\home\\site\\wwwroot"; // 파일 업로드 경로
+    private static final String UPLOAD_DIR = "/home/site/wwwroot"; // 파일 업로드 경로
     private Map<String, Boolean> mosaicStatus = new HashMap<>();
 
     @Autowired
