@@ -5,6 +5,7 @@ import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.azure.storage.blob.specialized.BlockBlobClient;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,43 +36,48 @@ public class AzureUploadController {
     // Azure Blob Storage에 파일을 업로드하는 메서드
     @PostMapping
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
-        String fileUrl = uploadToAzureBlob(file);
-        return ResponseEntity.ok(fileUrl);
+        try {
+            String fileUrl = uploadToAzureBlob(file);
+            return ResponseEntity.ok(fileUrl);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("파일 업로드 중 오류가 발생했습니다: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("알 수 없는 오류가 발생했습니다: " + e.getMessage());
+        }
     }
 
     // Azure Blob Storage에 파일을 업로드하는 실제 로직
-    private String uploadToAzureBlob(MultipartFile file) {
-        try {
-            String encodedSasToken = encodeSasToken(sasToken);
+    private String uploadToAzureBlob(MultipartFile file) throws IOException {
+        // SAS 토큰 URL 인코딩
+        String encodedSasToken = encodeSasToken(sasToken);
 
-            BlobServiceClient blobServiceClient = createBlobServiceClient();
-            BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(containerName);
+        // BlobServiceClient 생성
+        BlobServiceClient blobServiceClient = createBlobServiceClient(encodedSasToken);
+        BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(containerName);
 
-            String blobName = "question-images/" + UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-            BlockBlobClient blobClient = containerClient.getBlobClient(blobName).getBlockBlobClient();
+        // Blob 이름 생성
+        String blobName = "question-images/" + UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+        BlockBlobClient blobClient = containerClient.getBlobClient(blobName).getBlockBlobClient();
 
-            try (InputStream fileInputStream = file.getInputStream()) {
-                blobClient.upload(fileInputStream, file.getSize(), true);
-            }
-
-            return blobClient.getBlobUrl();
-        } catch (IOException e) {
-            throw new RuntimeException("파일 업로드 중 IOException 발생", e);
+        try (InputStream fileInputStream = file.getInputStream()) {
+            // 파일 업로드
+            blobClient.upload(fileInputStream, file.getSize(), true);
         }
+
+        return blobClient.getBlobUrl();
     }
 
+    // SAS 토큰을 URL 인코딩하는 메서드
     private String encodeSasToken(String sasToken) {
-        try {
-            return URLEncoder.encode(sasToken, StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            throw new RuntimeException("SAS 토큰 인코딩 오류", e);
-        }
+        return URLEncoder.encode(sasToken, StandardCharsets.UTF_8);
     }
 
-    private BlobServiceClient createBlobServiceClient() {
+    // BlobServiceClient를 생성하는 메서드
+    private BlobServiceClient createBlobServiceClient(String encodedSasToken) {
         return new BlobServiceClientBuilder()
-                .endpoint("https://" + storageAccountName + ".blob.core.windows.net")
-                .sasToken(sasToken)
+                .endpoint("https://" + storageAccountName + ".blob.core.windows.net?" + encodedSasToken)
                 .buildClient();
     }
 }
