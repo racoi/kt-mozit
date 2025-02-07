@@ -11,10 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -39,7 +36,7 @@ public class AzureUploadController {
     private String sasToken;
 
     // 파일 업로드
-    @PostMapping
+    @PutMapping
     public ResponseEntity<String> uploadFileToAzure(@RequestParam("file") MultipartFile file) {
         try {
             // BlobServiceClient를 사용하여 Azure Storage에 연결
