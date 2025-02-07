@@ -28,6 +28,7 @@ public class AzureAuthController {
 
     private final String AZURE_TOKEN_URL = "https://login.microsoftonline.com/%s/oauth2/v2.0/token";
 
+    // Azure에서 액세스 토큰을 받아오는 API 엔드포인트
     @PostMapping("/token")
     public ResponseEntity<?> getAzureToken() {
         RestTemplate restTemplate = new RestTemplate();
@@ -40,13 +41,17 @@ public class AzureAuthController {
         body.add("grant_type", "client_credentials");
         body.add("client_id", clientId);
         body.add("client_secret", clientSecret);
-        body.add("scope", "https://management.azure.com/.default");  // 변경된 부분
+        body.add("scope", "https://storage.azure.com/.default");  // Blob Storage API 접근을 위한 scope 설정
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
 
         try {
+            // Azure AD로부터 토큰 받기
             ResponseEntity<Map<String, Object>> response = restTemplate.exchange(url, HttpMethod.POST, request, new ParameterizedTypeReference<Map<String, Object>>() {});
-            return ResponseEntity.ok(response.getBody());
+            String accessToken = (String) response.getBody().get("access_token");
+
+            // 응답에 포함된 access_token을 클라이언트에게 반환
+            return ResponseEntity.ok(accessToken);
         } catch (HttpClientErrorException e) {
             return ResponseEntity.status(e.getStatusCode()).body("Failed to get token: " + e.getMessage());
         } catch (Exception e) {
