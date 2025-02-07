@@ -15,6 +15,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -31,12 +32,16 @@ public class AzureMetricsController {
 
     @GetMapping("/metrics")
     public ResponseEntity<?> getAzureMetrics() {
-        String sasToken = "sp=r&st=2025-02-05T06:23:43Z&se=2025-02-20T14:23:43Z&spr=https&sv=2022-11-02&sr=c&sig=zDCK%2BRpL8vDlrU07A1lKlwkTLUQ%2FEgAsR0EADA4xHeY%3D";
-        String storageUrl = "https://mozitstorage.blob.core.windows.net/insights-metrics-pt1m/resourceId=/SUBSCRIPTIONS/0A938E62-00BA-4C73-A908-3B285014B302/RESOURCEGROUPS/MOZIT/PROVIDERS/MICROSOFT.DBFORMYSQL/FLEXIBLESERVERS/MOZIT-DB/y=2025/m=02/d=05/h=06/m=00/PT1H.json";
-
         try {
-            // SAS 토큰을 URL에 추가하여 요청 보내기
-            ResponseEntity<String> response = restTemplate.exchange(storageUrl + "?" + sasToken, HttpMethod.GET, null, String.class);
+            String sasToken = "sp=r&st=2025-02-05T06:23:43Z&se=2025-02-20T14:23:43Z&spr=https&sv=2022-11-02&sr=c&sig=zDCK+RpL8vDlrU07A1lKlwkTLUQ/EGAsR0EADA4xHeY=";
+
+            // SAS 토큰 인코딩
+            String encodedSasToken = URLEncoder.encode(sasToken, "UTF-8");
+
+            String storageUrl = "https://mozitstorage.blob.core.windows.net/insights-metrics-pt1m/resourceId=/SUBSCRIPTIONS/0A938E62-00BA-4C73-A908-3B285014B302/RESOURCEGROUPS/MOZIT/PROVIDERS/MICROSOFT.DBFORMYSQL/FLEXIBLESERVERS/MOZIT-DB/y=2025/m=02/d=05/h=06/m=00/PT1H.json";
+
+            // 인코딩된 SAS 토큰을 URL에 포함시켜 요청
+            ResponseEntity<String> response = restTemplate.exchange(storageUrl + "?" + encodedSasToken, HttpMethod.GET, null, String.class);
             return ResponseEntity.ok(response.getBody());
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             // HTTP 오류 처리
