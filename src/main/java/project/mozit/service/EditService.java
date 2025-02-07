@@ -120,7 +120,8 @@ public class EditService {
         // ✅ 1시간 후 자동 삭제 예약
         scheduleFileDeletion(targetLocation.toFile(), 60 * 60);
 
-        return "파일이 성공적으로 업로드되었습니다: " + targetLocation.toString();  //저장된 파일 이름 반환
+//        return "파일이 성공적으로 업로드되었습니다: " + targetLocation.toString();  //저장된 파일 이름 반환
+        return targetLocation.toString();  //저장된 파일 이름 반환
     }
 
     private void scheduleFileDeletion(File file, int delaySeconds) {
@@ -187,7 +188,7 @@ public class EditService {
         // 요청 본문 생성
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("video_path", videoPath);
-        requestBody.put("output_path", "desired_output_path/thumbnail.jpg"); // 원하는 출력 경로
+        //requestBody.put("output_path", "desired_output_path/thumbnail.jpg"); // 원하는 출력 경로
 
         HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>(requestBody, headers);
 
