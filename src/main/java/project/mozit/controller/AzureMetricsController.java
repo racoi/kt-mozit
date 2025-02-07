@@ -33,8 +33,6 @@ public class AzureMetricsController {
     @GetMapping("/metrics")
     public ResponseEntity<?> getAzureMetrics() {
         try {
-            String sasToken = "sp=r&st=2025-02-05T06:23:43Z&se=2025-02-20T14:23:43Z&spr=https&sv=2022-11-02&sr=c&sig=zDCK+RpL8vDlrU07A1lKlwkTLUQ/EGAsR0EADA4xHeY=";
-
             // SAS 토큰 인코딩
             String encodedSasToken = URLEncoder.encode(sasToken, "UTF-8");
 
