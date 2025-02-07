@@ -31,11 +31,11 @@ public class AzureMetricsController {
 
     @GetMapping("/metrics")
     public ResponseEntity<?> getAzureMetrics() {
-        System.out.println("SAS Token: " + sasToken);
-
+        String sasToken = "sp=r&st=2025-02-05T06:23:43Z&se=2025-02-20T14:23:43Z&spr=https&sv=2022-11-02&sr=c&sig=zDCK%2BRpL8vDlrU07A1lKlwkTLUQ%2FEgAsR0EADA4xHeY%3D";
         String storageUrl = "https://mozitstorage.blob.core.windows.net/insights-metrics-pt1m/resourceId=/SUBSCRIPTIONS/0A938E62-00BA-4C73-A908-3B285014B302/RESOURCEGROUPS/MOZIT/PROVIDERS/MICROSOFT.DBFORMYSQL/FLEXIBLESERVERS/MOZIT-DB/y=2025/m=02/d=05/h=06/m=00/PT1H.json";
 
         try {
+            // SAS 토큰을 URL에 추가하여 요청 보내기
             ResponseEntity<String> response = restTemplate.exchange(storageUrl + "?" + sasToken, HttpMethod.GET, null, String.class);
             return ResponseEntity.ok(response.getBody());
         } catch (HttpClientErrorException | HttpServerErrorException e) {
