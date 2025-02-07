@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 @RestController
@@ -41,40 +42,36 @@ public class AzureUploadController {
     // Azure Blob Storage에 파일을 업로드하는 실제 로직
     private String uploadToAzureBlob(MultipartFile file) {
         try {
-            // SAS 토큰 URL 인코딩
             String encodedSasToken = encodeSasToken(sasToken);
 
-            // Azure Blob Storage 클라이언트 생성
-            String blobServiceUrl = "https://" + storageAccountName + ".blob.core.windows.net?" + encodedSasToken;
-            BlobServiceClient blobServiceClient = new BlobServiceClientBuilder()
-                    .endpoint(blobServiceUrl)
-                    .buildClient();
-
-            // 컨테이너 클라이언트 가져오기
+            BlobServiceClient blobServiceClient = createBlobServiceClient();
             BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(containerName);
 
-            // 파일 이름 생성
             String blobName = "question-images/" + UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
             BlockBlobClient blobClient = containerClient.getBlobClient(blobName).getBlockBlobClient();
 
-            // 파일을 Blob에 업로드
             try (InputStream fileInputStream = file.getInputStream()) {
                 blobClient.upload(fileInputStream, file.getSize(), true);
             }
 
-            // 업로드된 파일의 URL 반환
             return blobClient.getBlobUrl();
         } catch (IOException e) {
-            throw new RuntimeException("Error uploading file to Azure", e);
+            throw new RuntimeException("파일 업로드 중 IOException 발생", e);
         }
     }
 
-    // SAS 토큰을 URL 인코딩하는 메서드
     private String encodeSasToken(String sasToken) {
         try {
-            return URLEncoder.encode(sasToken, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("Error encoding SAS token", e);
+            return URLEncoder.encode(sasToken, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            throw new RuntimeException("SAS 토큰 인코딩 오류", e);
         }
+    }
+
+    private BlobServiceClient createBlobServiceClient() {
+        return new BlobServiceClientBuilder()
+                .endpoint("https://" + storageAccountName + ".blob.core.windows.net")
+                .sasToken(sasToken)
+                .buildClient();
     }
 }
