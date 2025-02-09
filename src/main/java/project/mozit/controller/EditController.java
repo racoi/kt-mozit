@@ -147,7 +147,7 @@ public class EditController {
         }
 
         Map<String, Object> response = new HashMap<>();
-        response.put("videoUrl", apiHost + "/videos/" + fileName);
+//        response.put("videoUrl", apiHost + "/videos/" + fileName);
         response.put("detections", frameInfos); // 모든 감지 데이터를 추가
 
         return ResponseEntity.ok(response);
