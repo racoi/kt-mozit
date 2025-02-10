@@ -70,30 +70,22 @@ public class EditController {
 
     // 편집 시작-DB에 저장
     @PostMapping("/start-editing")
-    public ResponseEntity<Object> startEditing(@RequestParam("videoFile") MultipartFile  file, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<Object> startEditing(@RequestBody Map<String, String> requestBody, @RequestHeader("Authorization") String token) {
+        String videoUrl = requestBody.get("videoUrl");
         try {
-            // 1. 파일 저장
-            String savedFileName = editService.uploadFile(file);
-            log.info("파일 저장 성공: {}", savedFileName);
-
-            // 2. 썸네일 생성 요청
-            String thumbnailUrl = editService.captureThumbnail(savedFileName);
+            // 1. 비디오 URL을 통해 썸네일 생성 요청
+            String thumbnailUrl = editService.captureThumbnail(videoUrl);
             log.info("썸네일 생성 성공: {}", thumbnailUrl);
 
-            // 3. DB 저장 및 editNum 반환
+            // 2. DB 저장 및 editNum 반환
             Long editNum = editService.saveStartEditing(thumbnailUrl, token);
             log.info("DB 저장 성공, editNum: {}", editNum);
 
             // 응답 객체 생성
             Map<String, Object> response = new HashMap<>();
             response.put("editNum", editNum);
-            response.put("savedFileName", savedFileName);
 
             return ResponseEntity.ok(response);
-        } catch (IOException e) {
-            log.error("파일 저장 실패", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("파일 저장 실패: " + e.getMessage());
         } catch (Exception e) {
             log.error("처리 중 오류 발생", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -155,7 +147,7 @@ public class EditController {
         }
 
         Map<String, Object> response = new HashMap<>();
-        response.put("videoUrl", apiHost + "/videos/" + fileName);
+//        response.put("videoUrl", apiHost + "/videos/" + fileName);
         response.put("detections", frameInfos); // 모든 감지 데이터를 추가
 
         return ResponseEntity.ok(response);
