@@ -2,6 +2,7 @@ package project.mozit.dto;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Data
 @AllArgsConstructor
@@ -14,7 +15,7 @@ public class EditsDTO {
     @Getter
     private String editTitle;
     private String thumbnail;
-    private LocalDateTime timestamp;
+    private OffsetDateTime timestamp;
     private Long userNum;
     private Boolean hasDownload;
 

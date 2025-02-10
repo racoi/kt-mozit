@@ -3,7 +3,7 @@ package project.mozit.dto;
 import lombok.Data;
 import project.mozit.domain.Questions;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 public class AnswersDTO {
 
@@ -16,7 +16,7 @@ public class AnswersDTO {
     @Data
     public static class Response{
         private Long answerNum;
-        private LocalDateTime timestamp;
+        private OffsetDateTime timestamp;
         private String answerDetail;
     }
 }

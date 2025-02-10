@@ -5,6 +5,7 @@ import project.mozit.domain.Questions;
 import project.mozit.domain.Users;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 public class QuestionsDTO {
 
@@ -19,7 +20,7 @@ public class QuestionsDTO {
     @Data
     public static class Response{
         private Long questionNum;
-        private LocalDateTime timestamp;
+        private OffsetDateTime timestamp;
         private String questionTitle;
         private String questionDetail;
         private Questions.QuestionType questionType;
@@ -32,7 +33,7 @@ public class QuestionsDTO {
         @Data
         public static class AnswerResponse{
             private Long answerNum;
-            private LocalDateTime timestamp;
+            private OffsetDateTime timestamp;
             private String answerDetail;
         }
     }

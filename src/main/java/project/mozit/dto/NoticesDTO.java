@@ -3,6 +3,7 @@ package project.mozit.dto;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 public class NoticesDTO {
 
@@ -21,8 +22,8 @@ public class NoticesDTO {
     @Data
     public static class Response{
         private Long noticeNum;
-        private LocalDateTime createdAt;
-        private LocalDateTime updatedAt;
+        private OffsetDateTime createdAt;
+        private OffsetDateTime updatedAt;
         private String noticeTitle;
         private String noticeDetail;
     }
