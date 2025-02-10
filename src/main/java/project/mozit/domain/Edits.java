@@ -4,8 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import java.time.OffsetDateTime;
 
 @Entity
 @Data
@@ -17,7 +16,7 @@ public class Edits {
 
     @CreationTimestamp
     @Column(name = "timestamp")
-    private LocalDateTime timestamp;
+    private OffsetDateTime timestamp;
 
     @Column(name = "edit_title")
     private String editTitle;

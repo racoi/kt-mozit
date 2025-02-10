@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Entity
 @Data
@@ -20,7 +20,7 @@ public class Answers {
 
     @CreationTimestamp
     @Column(name = "timestamp")
-    private LocalDateTime timestamp;
+    private OffsetDateTime timestamp;
 
     @Column(name = "answer_detail", nullable = false)
     private String answerDetail;
