@@ -32,7 +32,7 @@ public class Questions {
     @Column(name = "question_state", nullable = false)
     private Boolean questionState = false;
 
-    @Column(name = "question_image")
+    @Column(name = "question_image", length = 1000)
     private String questionImage;
 
     @ManyToOne(fetch = FetchType.LAZY)
