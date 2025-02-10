@@ -22,7 +22,7 @@ public class Edits {
     @Column(name = "edit_title")
     private String editTitle;
 
-    @Column(name = "thumbnail", nullable = false)
+    @Column(name = "thumbnail", nullable = false, length = 1000)
     private String thumbnail;
 
     @ManyToOne(fetch = FetchType.LAZY)
