@@ -171,7 +171,6 @@ public class EditService {
 
         edits.setEditTitle("제목 없음"); // *
         edits.setThumbnail(thumbnail); //1. 썸네일 경로
-        edits.setTimestamp(LocalDateTime.now()); // 2. 현재 시간 설정
         edits.setUserNum(userNum); // Users 객체를 설정
 
         // DB에 저장
