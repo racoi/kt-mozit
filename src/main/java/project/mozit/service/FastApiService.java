@@ -53,9 +53,6 @@ public class FastApiService {
     }
 
 
-
-
-
     public List<VideoResponse.FrameInfo> getVideoResponse(String videoPath) {
         VideoResponse videoResponse = responseCache.get(videoPath);
         if (videoResponse != null) {

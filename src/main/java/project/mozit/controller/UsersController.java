@@ -8,7 +8,6 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.mozit.dto.EmailDTO;
-import project.mozit.dto.NoticesDTO;
 import project.mozit.dto.UserWorkDownloadDTO;
 import project.mozit.dto.UsersDTO;
 import project.mozit.service.EmailService;

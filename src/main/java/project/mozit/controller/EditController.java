@@ -30,7 +30,6 @@ public class EditController {
     // 모자이크 상태를 클래스명별로 저장
     private Map<String, Boolean> mosaicStatus = new HashMap<>();
 
-//    private static final String UPLOAD_DIR = "D:\\home\\uploads"; // 비디오 파일이 저장된 경로
 
     private static final Logger log = LoggerFactory.getLogger(EditController.class);
 
@@ -64,9 +63,6 @@ public class EditController {
                     .body("파일 업로드 실패: " + e.getMessage());
         }
     }
-
-
-
 
     // 편집 시작-DB에 저장
     @PostMapping("/start-editing")
@@ -117,10 +113,6 @@ public class EditController {
         }
     }
 
-
-
-
-
     //편집 화면에서 동영상 불러오기
     @GetMapping("/videos/{fileName}")
     public ResponseEntity<FileSystemResource> getVideo(@PathVariable("fileName") String fileName) {
@@ -154,7 +146,6 @@ public class EditController {
     }
 
 
-
 // 편집 완료시 제목 넣기
     @PutMapping("/{editNum}")
     public ResponseEntity<Void> updateEditTitle(@PathVariable("editNum") Long editNum, @RequestBody EditsDTO editsDTO) {
@@ -166,31 +157,6 @@ public class EditController {
         return ResponseEntity.ok().build(); // 200 OK
     }
 
-
-
-
-
-
-    // 파일 다운로드 및 DB에 저장
-//    @PostMapping("/download")
-//    public ResponseEntity<Resource> downloadFile(@RequestParam("fileName") String fileName,
-//                                                 @RequestParam("editNum") Long editNum) {
-//        if (fileName == null || fileName.isBlank()) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-//        }
-//
-//        try {
-//            // DB에 다운로드 정보 저장
-//            editService.saveDownloadInfo(fileName, editNum);
-//            return editService.downloadFile(fileName);  //동영상 다운로드
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-//        }
-//    }
 
     @PostMapping("/download")
     public ResponseEntity<Void> downloadFile(@RequestBody DownloadsDTO downloadsDTO) {
@@ -217,9 +183,6 @@ public class EditController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
-
-
 
 
     // 다시 편집 요청

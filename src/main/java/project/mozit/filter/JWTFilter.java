@@ -9,14 +9,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import project.mozit.domain.Users;
 import project.mozit.dto.CustomUserDetails;
 import project.mozit.repository.UsersRepository;
 import project.mozit.util.JWTUtil;
 
 import java.io.IOException;
-import java.util.List;
 
 @AllArgsConstructor
 public class JWTFilter extends OncePerRequestFilter {
@@ -63,7 +61,6 @@ public class JWTFilter extends OncePerRequestFilter {
             );
 
             SecurityContextHolder.getContext().setAuthentication(authToken);
-            System.out.println("Authentication set in SecurityContext: " + SecurityContextHolder.getContext().getAuthentication());
 
             filterChain.doFilter(request, response);
         } catch (Exception e) {

@@ -46,22 +46,6 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-//        http
-//                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 설정 추가
-//                .authorizeHttpRequests((auth) -> auth
-//                        .requestMatchers("/**").permitAll()  // 모든 요청 허용 (필요에 따라 수정)
-//                )
-//                .csrf((csrf) -> csrf.disable())
-//                .formLogin((auth) -> auth.disable())
-//                .addFilterBefore(new JWTFilter(jwtUtil, usersRepository), LoginFilter.class)
-//                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, redisUtil), UsernamePasswordAuthenticationFilter.class)
-//                .headers(headers -> headers
-//                        .addHeaderWriter(new XFrameOptionsHeaderWriter(
-//                                XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN))
-//                )
-//                .sessionManagement((session) -> session
-//                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//                );
             http
                     .csrf(csrf -> csrf.ignoringRequestMatchers("/**")) // ✅ CSRF 보호 비활성화
                     .cors(cors -> cors.configurationSource(corsConfigurationSource())) // ✅ CORS 설정 추가

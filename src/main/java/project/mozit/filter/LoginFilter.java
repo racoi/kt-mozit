@@ -64,7 +64,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         redisUtil.setDataExpire(username, refreshToken, jwtUtil.getRefreshTokenExpiration() / 1000);
 
         response.addHeader("Authorization", "Bearer " + accessToken);
-//        response.addHeader("Refresh-Token", refreshToken);
         // Refresh Token을 HttpOnly 쿠키로 설정
         ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)
